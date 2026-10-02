@@ -1,0 +1,16 @@
+{
+  "name": "stride-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "STRIDE - High-performance Gen-Z Fitness & GPS Activity Tracking Platform",
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:mobile": "npm --prefix mobile run dev",
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix mobile run dev\"",
+    "build": "npm --prefix backend run build && npm --prefix mobile run build",
+    "seed": "npm --prefix backend run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

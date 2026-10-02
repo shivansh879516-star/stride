@@ -1,0 +1,18 @@
+{
+  "name": "STRIDE GPS Fitness",
+  "short_name": "STRIDE",
+  "description": "Next-Gen Real GPS Running, Cycling & Athletic Tracking Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
