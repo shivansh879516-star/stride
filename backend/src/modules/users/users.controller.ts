@@ -81,7 +81,7 @@ export async function updateProfile(req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    const { firstName, lastName, bio, city, country, heightCm, weightKg, weeklyGoalKm } = req.body;
+    const { firstName, lastName, bio, avatarUrl, city, country, heightCm, weightKg, weeklyGoalKm } = req.body;
 
     const updated = await prisma.profile.update({
       where: { userId },
@@ -89,6 +89,7 @@ export async function updateProfile(req: AuthRequest, res: Response): Promise<vo
         firstName: firstName !== undefined ? firstName : undefined,
         lastName: lastName !== undefined ? lastName : undefined,
         bio: bio !== undefined ? bio : undefined,
+        avatarUrl: avatarUrl !== undefined ? avatarUrl : undefined,
         city: city !== undefined ? city : undefined,
         country: country !== undefined ? country : undefined,
         heightCm: heightCm ? parseFloat(heightCm) : undefined,

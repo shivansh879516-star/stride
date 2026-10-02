@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Download,
@@ -387,21 +388,21 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.88)',
-        backdropFilter: 'blur(10px)',
-        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.92)',
+        backdropFilter: 'blur(14px)',
+        zIndex: 999999,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '16px 12px 24px',
+        padding: 'calc(var(--safe-top, 0px) + 16px) 14px calc(var(--safe-bottom, 16px) + 20px)',
         color: '#ffffff',
-        animation: 'fadeIn 0.2s ease',
+        animation: 'strideScaleIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards',
       }}
     >
       {/* Toast Notification */}
@@ -753,6 +754,7 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

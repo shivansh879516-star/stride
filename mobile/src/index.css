@@ -352,7 +352,7 @@ h1, h2, h3, h4 {
 @keyframes strideFadeSlideUp {
   0% {
     opacity: 0;
-    transform: translateY(12px) scale(0.99);
+    transform: translateY(16px) scale(0.985);
   }
   100% {
     opacity: 1;
@@ -363,7 +363,7 @@ h1, h2, h3, h4 {
 @keyframes strideScaleIn {
   0% {
     opacity: 0;
-    transform: scale(0.93);
+    transform: scale(0.92);
   }
   100% {
     opacity: 1;
@@ -399,25 +399,25 @@ h1, h2, h3, h4 {
 }
 
 .stride-animate-in {
-  animation: strideFadeSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: strideFadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .stride-modal-animate {
-  animation: strideScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: strideScaleIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Tactile micro-transitions on interactive controls */
 button, a, [role="button"] {
-  transition: transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.14s ease, filter 0.14s ease;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease, filter 0.2s ease;
   user-select: none;
 }
 
 button:active:not(:disabled), a:active, [role="button"]:active {
-  transform: scale(0.96);
-  filter: brightness(0.95);
+  transform: scale(0.95);
+  filter: brightness(0.94);
 }
 
 .stride-card {
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 

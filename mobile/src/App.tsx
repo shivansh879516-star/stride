@@ -17,7 +17,16 @@ import { initLocalNotifications } from './services/notifications';
 
 export function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
-  const [activeTab, setActiveTab] = useState<NavTab>('HOME');
+  const [tabHistory, setTabHistory] = useState<NavTab[]>(['HOME']);
+  const activeTab = tabHistory[tabHistory.length - 1] || 'HOME';
+
+  const setActiveTab = (tab: NavTab) => {
+    setTabHistory((prev) => {
+      if (prev[prev.length - 1] === tab) return prev;
+      return [...prev, tab];
+    });
+  };
+
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
@@ -58,7 +67,7 @@ export function App() {
     initLocalNotifications();
   }, []);
 
-  // Native Android Hardware Back Button Handling
+  // Native Android Hardware Back Button Handling: Back 1 page at a time
   useEffect(() => {
     if (!Capacitor.isPluginAvailable('App')) return;
 
@@ -77,21 +86,22 @@ export function App() {
         return;
       }
 
-      // 2. If on a sub-screen / tab other than HOME, navigate to HOME
-      if (activeTab !== 'HOME') {
-        if (activeTab === 'RECORD') {
-          // If in record screen, confirm before discarding or canceling
-          if (window.confirm('Exit Stride recording and return to Home?')) {
-            setSelectedRouteForRecord(null);
-            setActiveTab('HOME');
-          }
-          return;
+      // 2. If in record screen, confirm before exiting
+      if (activeTab === 'RECORD') {
+        if (window.confirm('Exit Stride recording and return to previous page?')) {
+          setSelectedRouteForRecord(null);
+          setTabHistory((prev) => (prev.length > 1 ? prev.slice(0, -1) : ['HOME']));
         }
-        setActiveTab('HOME');
         return;
       }
 
-      // 3. Double-tap back to exit on HOME screen
+      // 3. Step back ONE page in history stack
+      if (tabHistory.length > 1) {
+        setTabHistory((prev) => prev.slice(0, -1));
+        return;
+      }
+
+      // 4. Double-tap back to exit on the first page (HOME)
       const now = Date.now();
       if (now - lastBackPressRef.current < 2000) {
         CapApp.exitApp();
@@ -105,7 +115,7 @@ export function App() {
     return () => {
       listenerPromise.then((handler) => handler.remove()).catch(() => {});
     };
-  }, [selectedActivityId, showNotifications, showAuthModal, isAuthenticated, activeTab]);
+  }, [selectedActivityId, showNotifications, showAuthModal, isAuthenticated, tabHistory, activeTab]);
 
   const initializeApp = async () => {
     const token = getToken();
@@ -124,17 +134,28 @@ export function App() {
         setIsAuthenticated(false);
         setShowAuthModal(true);
       }
-    } catch {
-      removeToken();
-      setIsAuthenticated(false);
-      setShowAuthModal(true);
+    } catch (err: any) {
+      if (err.message && err.message.includes('401')) {
+        removeToken();
+        setIsAuthenticated(false);
+        setShowAuthModal(true);
+      } else {
+        // Keep authenticated if network is slow/offline
+        setIsAuthenticated(true);
+        loadHomeData();
+      }
     }
   };
 
   const loadHomeData = async () => {
     try {
       const profRes = await api.getProfile();
-      setProfile(profRes.profile);
+      const cachedAvatar = localStorage.getItem('stride_athlete_avatar');
+      const finalProfile = profRes.profile;
+      if (cachedAvatar && (!finalProfile.avatarUrl || finalProfile.avatarUrl === '')) {
+        finalProfile.avatarUrl = cachedAvatar;
+      }
+      setProfile(finalProfile);
       setWeeklyStats(profRes.weekly);
 
       const actRes = await api.getActivities({ limit: 5 });
@@ -175,8 +196,8 @@ export function App() {
         />
       )}
 
-      {/* Main Tab Screen Content */}
-      <main style={{ flex: 1, position: 'relative' }}>
+      {/* Main Tab Screen Content with Smooth Transitions */}
+      <main key={activeTab} className="stride-animate-in" style={{ flex: 1, position: 'relative' }}>
         {activeTab === 'HOME' && (
           <HomeScreen
             profile={profile}

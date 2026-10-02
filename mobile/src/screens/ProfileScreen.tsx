@@ -55,6 +55,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  const [currentAvatar, setCurrentAvatar] = useState<string>(() => {
+    return profile?.avatarUrl || localStorage.getItem('stride_athlete_avatar') || '';
+  });
+
+  useEffect(() => {
+    if (profile?.avatarUrl) {
+      setCurrentAvatar(profile.avatarUrl);
+      localStorage.setItem('stride_athlete_avatar', profile.avatarUrl);
+    }
+  }, [profile?.avatarUrl]);
+
   const PRESET_AVATARS = [
     { id: '1', label: '⚡ Bolt Runner', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80' },
     { id: '2', label: '🏔️ Trail Master', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80' },
@@ -64,12 +75,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   ];
 
   const handleSelectPreset = async (url: string) => {
+    setCurrentAvatar(url);
+    localStorage.setItem('stride_athlete_avatar', url);
+    setShowAvatarModal(false);
     try {
       await api.updateProfile({ avatarUrl: url });
       onProfileUpdated();
-      setShowAvatarModal(false);
     } catch (err) {
-      console.warn('Failed to update avatar', err);
+      console.warn('Background avatar sync failed', err);
     }
   };
 
@@ -82,7 +95,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       const img = new Image();
       img.onload = async () => {
         const canvas = document.createElement('canvas');
-        const maxDim = 256;
+        const maxDim = 160;
         let width = img.width;
         let height = img.height;
         if (width > height) {
@@ -101,13 +114,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          setCurrentAvatar(dataUrl);
+          localStorage.setItem('stride_athlete_avatar', dataUrl);
+          setShowAvatarModal(false);
           try {
             await api.updateProfile({ avatarUrl: dataUrl });
             onProfileUpdated();
-            setShowAvatarModal(false);
           } catch (err) {
-            console.warn('Failed to save custom photo', err);
+            console.warn('Background photo sync failed', err);
           }
         }
       };
@@ -287,8 +302,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             }}
             title="Change Avatar or Photo"
           >
-            {profile?.avatarUrl ? (
-              <img src={profile.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            {currentAvatar ? (
+              <img src={currentAvatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <User size={34} color="var(--accent-yellow)" />
             )}

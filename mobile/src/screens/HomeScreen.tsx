@@ -27,17 +27,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onViewAchievements,
 }) => {
   const [sharingActivity, setSharingActivity] = useState<any | null>(null);
-  const [joshGiven, setJoshGiven] = useState<Record<string, number>>({});
-  const [joshToast, setJoshToast] = useState<string | null>(null);
+  const [hypeGiven, setHypeGiven] = useState<Record<string, number>>({});
+  const [hypeToast, setHypeToast] = useState<string | null>(null);
 
-  const handleGiveJosh = (actId: string) => {
+  const handleGiveHype = (actId: string) => {
     soundEngine.playJosh();
-    setJoshGiven((prev) => ({
+    setHypeGiven((prev) => ({
       ...prev,
       [actId]: (prev[actId] || 0) + 1,
     }));
-    setJoshToast('Full Josh! 🔥 Shabash Athlete!');
-    setTimeout(() => setJoshToast(null), 2200);
+    setHypeToast('Full Hype! ⚡ Athlete in the zone!');
+    setTimeout(() => setHypeToast(null), 2200);
   };
 
   const getGreeting = () => {
@@ -55,9 +55,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   };
 
   return (
-    <div className="stride-animate-in" style={{ padding: '20px 18px 110px', display: 'flex', flexDirection: 'column', gap: '22px', position: 'relative' }}>
-      {/* Josh Toast Notification */}
-      {joshToast && (
+    <div style={{ padding: '20px 18px 110px', display: 'flex', flexDirection: 'column', gap: '22px', position: 'relative' }}>
+      {/* Hype Toast Notification */}
+      {hypeToast && (
         <div
           style={{
             position: 'fixed',
@@ -75,11 +75,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            animation: 'strideFadeSlideUp 0.25s ease-out forwards',
+            animation: 'strideFadeSlideUp 0.35s ease-out forwards',
           }}
         >
-          <Flame size={18} color="#f59e0b" fill="#f59e0b" />
-          <span>{joshToast}</span>
+          <Zap size={18} color="#10b981" fill="#10b981" />
+          <span>{hypeToast}</span>
         </div>
       )}
       {/* Athlete Header & Streak Badge */}
@@ -438,21 +438,21 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     }}
                   >
                     <button
-                      onClick={() => handleGiveJosh(act.id)}
+                      onClick={() => handleGiveHype(act.id)}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
                         background: 'none',
                         border: 'none',
-                        color: joshGiven[act.id] ? '#ef4444' : 'inherit',
-                        fontWeight: joshGiven[act.id] ? 700 : 500,
+                        color: hypeGiven[act.id] ? '#10b981' : 'inherit',
+                        fontWeight: hypeGiven[act.id] ? 700 : 500,
                         cursor: 'pointer',
                       }}
-                      title="Give Josh to athlete"
+                      title="Give Hype to athlete"
                     >
-                      <Flame size={16} color={joshGiven[act.id] ? '#ef4444' : 'var(--text-muted)'} fill={joshGiven[act.id] ? '#ef4444' : 'none'} />
-                      <span>{joshGiven[act.id] ? `Josh (${joshGiven[act.id]}) 🔥` : 'Josh 🔥'}</span>
+                      <Zap size={16} color={hypeGiven[act.id] ? '#10b981' : 'var(--text-muted)'} fill={hypeGiven[act.id] ? '#10b981' : 'none'} />
+                      <span>{hypeGiven[act.id] ? `Hype (${hypeGiven[act.id]}) ⚡` : 'Hype ⚡'}</span>
                     </button>
 
                     <button
