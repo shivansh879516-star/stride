@@ -2,12 +2,10 @@
  * STRIDE API Client & Offline Sync Engine
  */
 
-const API_BASE =
+export const API_BASE =
   ((import.meta as any).env?.VITE_API_URL as string) ||
-  (typeof window !== 'undefined' &&
-  window.location.hostname !== 'localhost' &&
-  window.location.hostname !== '127.0.0.1' &&
-  !window.location.hostname.startsWith('192.168.')
+  ((import.meta as any).env?.PROD ||
+  (typeof window !== 'undefined' && (window as any).Capacitor !== undefined)
     ? 'https://stride-backendd.onrender.com/api'
     : '/api');
 
@@ -112,10 +110,12 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers,
   });
 
+  const rawText = await response.text();
+
   if (!response.ok) {
     let errorMsg = `HTTP ${response.status}`;
     try {
-      const data = await response.json();
+      const data = JSON.parse(rawText);
       errorMsg = data.error || data.message || errorMsg;
     } catch {
       // ignore
@@ -123,7 +123,11 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     throw new Error(errorMsg);
   }
 
-  return response.json();
+  try {
+    return JSON.parse(rawText) as T;
+  } catch {
+    throw new Error('Server connection error. Please try again.');
+  }
 }
 
 export const api = {
