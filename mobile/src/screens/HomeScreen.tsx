@@ -3,6 +3,7 @@ import { Flame, Play, ChevronRight, Award, Zap, Clock, Route, Compass, ThumbsUp,
 import { ActivitySummary, UserProfile, ChallengeItem } from '../services/api';
 import { MapViewer } from '../components/Map/MapViewer';
 import { ShareActivityModal } from '../components/Share/ShareActivityModal';
+import { soundEngine } from '../services/audio';
 
 interface HomeScreenProps {
   profile: UserProfile | null;
@@ -26,6 +27,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onViewAchievements,
 }) => {
   const [sharingActivity, setSharingActivity] = useState<any | null>(null);
+  const [joshGiven, setJoshGiven] = useState<Record<string, number>>({});
+  const [joshToast, setJoshToast] = useState<string | null>(null);
+
+  const handleGiveJosh = (actId: string) => {
+    soundEngine.playJosh();
+    setJoshGiven((prev) => ({
+      ...prev,
+      [actId]: (prev[actId] || 0) + 1,
+    }));
+    setJoshToast('Full Josh! 🔥 Shabash Athlete!');
+    setTimeout(() => setJoshToast(null), 2200);
+  };
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -42,7 +55,33 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   };
 
   return (
-    <div style={{ padding: '20px 18px 110px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+    <div className="stride-animate-in" style={{ padding: '20px 18px 110px', display: 'flex', flexDirection: 'column', gap: '22px', position: 'relative' }}>
+      {/* Josh Toast Notification */}
+      {joshToast && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 'calc(var(--safe-top, 0px) + 72px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: '#0f172a',
+            color: '#ffffff',
+            padding: '10px 20px',
+            borderRadius: 'var(--radius-full)',
+            fontSize: '13px',
+            fontWeight: 800,
+            zIndex: 9999,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            animation: 'strideFadeSlideUp 0.25s ease-out forwards',
+          }}
+        >
+          <Flame size={18} color="#f59e0b" fill="#f59e0b" />
+          <span>{joshToast}</span>
+        </div>
+      )}
       {/* Athlete Header & Streak Badge */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
@@ -399,10 +438,21 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     }}
                   >
                     <button
-                      onClick={() => alert('Kudos sent to athlete!')}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}
+                      onClick={() => handleGiveJosh(act.id)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: 'none',
+                        border: 'none',
+                        color: joshGiven[act.id] ? '#ef4444' : 'inherit',
+                        fontWeight: joshGiven[act.id] ? 700 : 500,
+                        cursor: 'pointer',
+                      }}
+                      title="Give Josh to athlete"
                     >
-                      <ThumbsUp size={16} /> Kudos
+                      <Flame size={16} color={joshGiven[act.id] ? '#ef4444' : 'var(--text-muted)'} fill={joshGiven[act.id] ? '#ef4444' : 'none'} />
+                      <span>{joshGiven[act.id] ? `Josh (${joshGiven[act.id]}) 🔥` : 'Josh 🔥'}</span>
                     </button>
 
                     <button
@@ -415,9 +465,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     <button
                       onClick={() => setSharingActivity(act)}
                       style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#10b981', fontWeight: 600, cursor: 'pointer', marginLeft: 'auto' }}
-                      title="Share to Instagram Story & Socials"
+                      title="Share Activity"
                     >
-                      <Share2 size={16} /> Share Story
+                      <Share2 size={16} /> Share
                     </button>
                   </div>
                 </div>

@@ -12,6 +12,8 @@ import { NotificationsModal } from './screens/NotificationsModal';
 import { api, getToken, removeToken, UserProfile, ActivitySummary, ChallengeItem } from './services/api';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { App as CapApp } from '@capacitor/app';
+import { initLocalNotifications } from './services/notifications';
 
 export function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
@@ -21,6 +23,8 @@ export function App() {
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [selectedRouteForRecord, setSelectedRouteForRecord] = useState<any | null>(null);
+  const [backToast, setBackToast] = useState<string | null>(null);
+  const lastBackPressRef = React.useRef<number>(0);
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [weeklyStats, setWeeklyStats] = useState({
@@ -48,10 +52,60 @@ export function App() {
     }
   }, [theme]);
 
-  // Load User Data & Verify Session
+  // Load User Data & Verify Session + Init Daily Notifications
   useEffect(() => {
     initializeApp();
+    initLocalNotifications();
   }, []);
+
+  // Native Android Hardware Back Button Handling
+  useEffect(() => {
+    if (!Capacitor.isPluginAvailable('App')) return;
+
+    const listenerPromise = CapApp.addListener('backButton', () => {
+      // 1. If any modal is active, close it
+      if (selectedActivityId) {
+        setSelectedActivityId(null);
+        return;
+      }
+      if (showNotifications) {
+        setShowNotifications(false);
+        return;
+      }
+      if (showAuthModal && isAuthenticated) {
+        setShowAuthModal(false);
+        return;
+      }
+
+      // 2. If on a sub-screen / tab other than HOME, navigate to HOME
+      if (activeTab !== 'HOME') {
+        if (activeTab === 'RECORD') {
+          // If in record screen, confirm before discarding or canceling
+          if (window.confirm('Exit Stride recording and return to Home?')) {
+            setSelectedRouteForRecord(null);
+            setActiveTab('HOME');
+          }
+          return;
+        }
+        setActiveTab('HOME');
+        return;
+      }
+
+      // 3. Double-tap back to exit on HOME screen
+      const now = Date.now();
+      if (now - lastBackPressRef.current < 2000) {
+        CapApp.exitApp();
+      } else {
+        lastBackPressRef.current = now;
+        setBackToast('Press back again to exit STRIDE');
+        setTimeout(() => setBackToast(null), 2000);
+      }
+    });
+
+    return () => {
+      listenerPromise.then((handler) => handler.remove()).catch(() => {});
+    };
+  }, [selectedActivityId, showNotifications, showAuthModal, isAuthenticated, activeTab]);
 
   const initializeApp = async () => {
     const token = getToken();
@@ -211,6 +265,29 @@ export function App() {
             loadHomeData();
           }}
         />
+      )}
+
+      {/* Back Button Exit Toast */}
+      {backToast && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 'calc(var(--safe-bottom, 16px) + 80px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            color: '#ffffff',
+            padding: '10px 20px',
+            borderRadius: 'var(--radius-full)',
+            fontSize: '13px',
+            fontWeight: 700,
+            zIndex: 10000,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+            animation: 'strideFadeSlideUp 0.2s ease-out forwards',
+          }}
+        >
+          {backToast}
+        </div>
       )}
     </div>
   );

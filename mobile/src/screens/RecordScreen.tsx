@@ -28,6 +28,7 @@ import { MapViewer } from '../components/Map/MapViewer';
 import { PaceAreaChart } from '../components/Charts/PaceAreaChart';
 import { ShareActivityModal } from '../components/Share/ShareActivityModal';
 import { api, offlineStorage } from '../services/api';
+import { soundEngine } from '../services/audio';
 
 interface RecordScreenProps {
   theme: 'dark' | 'light';
@@ -86,8 +87,45 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
     { label: '6:30', value: 390 },
   ];
 
-  // Trigger celebration confetti
+  const [countdown, setCountdown] = useState<number | null>(null);
+
+  const handleStartWithCountdown = () => {
+    setCountdown(3);
+    soundEngine.playCountdown(3);
+
+    setTimeout(() => {
+      setCountdown(2);
+      soundEngine.playCountdown(2);
+    }, 1000);
+
+    setTimeout(() => {
+      setCountdown(1);
+      soundEngine.playCountdown(1);
+    }, 2000);
+
+    setTimeout(() => {
+      setCountdown(0);
+      soundEngine.playCountdown(0);
+      tracker.startTracking();
+      setTimeout(() => {
+        setCountdown(null);
+      }, 700);
+    }, 3000);
+  };
+
+  const handlePause = () => {
+    soundEngine.playPause();
+    tracker.pauseTracking();
+  };
+
+  const handleResume = () => {
+    soundEngine.playStart();
+    tracker.resumeTracking();
+  };
+
+  // Trigger celebration confetti and finish fanfare
   const handleFinish = () => {
+    soundEngine.playFinish();
     tracker.finishTracking();
     setShowCelebration(true);
     confetti({
@@ -166,7 +204,54 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
     : null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100dvh', overflow: 'hidden', backgroundColor: '#f4f6f8' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100dvh', overflow: 'hidden', backgroundColor: '#f4f6f8', position: 'relative' }}>
+      {/* 3-Second Countdown Kinetic Visual Overlay */}
+      {countdown !== null && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99999,
+            backgroundColor: 'rgba(15, 23, 42, 0.88)',
+            backdropFilter: 'blur(12px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#ffffff',
+          }}
+        >
+          <div
+            key={countdown}
+            style={{
+              fontSize: countdown === 0 ? '76px' : '110px',
+              fontWeight: 900,
+              fontFamily: 'var(--font-heading)',
+              color: countdown === 0 ? '#10b981' : '#ffffff',
+              animation: 'strideCountdownPop 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              textShadow: '0 0 35px rgba(16, 185, 129, 0.65)',
+            }}
+          >
+            {countdown === 0 ? 'GO!' : countdown}
+          </div>
+          <div
+            style={{
+              fontSize: '15px',
+              fontWeight: 800,
+              color: '#94a3b8',
+              marginTop: '16px',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {countdown === 0 ? 'Stride in Progress ⚡' : 'Get Ready 👟'}
+          </div>
+        </div>
+      )}
+
       {/* ======================================================== */}
       {/* TOP HALF (48%): LIVE GPS MAP VIEWER WITH ROUTE & LOCATE */}
       {/* ======================================================== */}
@@ -503,7 +588,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             {/* 5. Big Vibrant Athletic Green Start Button */}
             <button
               id="record-start-btn"
-              onClick={tracker.startTracking}
+              onClick={handleStartWithCountdown}
               style={{
                 marginTop: '4px',
                 padding: '16px',
@@ -710,7 +795,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button
                     id="record-pause-btn"
-                    onClick={tracker.pauseTracking}
+                    onClick={handlePause}
                     style={{
                       flex: 3,
                       padding: '16px',
@@ -759,7 +844,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button
                     id="record-resume-btn"
-                    onClick={tracker.resumeTracking}
+                    onClick={handleResume}
                     style={{
                       flex: 2,
                       padding: '16px',

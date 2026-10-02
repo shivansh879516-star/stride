@@ -345,3 +345,79 @@ h1, h2, h3, h4 {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 4px;
 }
+
+/* ======================================================== */
+/* SMOOTH KINETIC ANIMATIONS & TACTILE TOUCH INTERACTIONS   */
+/* ======================================================== */
+@keyframes strideFadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes strideScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.93);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes strideCountdownPop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes stridePulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(16, 185, 129, 0.7);
+  }
+}
+
+.stride-animate-in {
+  animation: strideFadeSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stride-modal-animate {
+  animation: strideScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Tactile micro-transitions on interactive controls */
+button, a, [role="button"] {
+  transition: transform 0.14s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.14s ease, filter 0.14s ease;
+  user-select: none;
+}
+
+button:active:not(:disabled), a:active, [role="button"]:active {
+  transform: scale(0.96);
+  filter: brightness(0.95);
+}
+
+.stride-card {
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+

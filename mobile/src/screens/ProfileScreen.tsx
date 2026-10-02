@@ -14,6 +14,10 @@ import {
   LogOut,
   MapPin,
   CheckCircle,
+  Camera,
+  ShieldCheck,
+  X,
+  Upload,
 } from 'lucide-react';
 import { api, UserProfile, offlineStorage } from '../services/api';
 
@@ -46,6 +50,71 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [activeShareToken, setActiveShareToken] = useState<string | null>(null);
   const [newContactName, setNewContactName] = useState('');
   const [newContactPhone, setNewContactPhone] = useState('');
+
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const PRESET_AVATARS = [
+    { id: '1', label: '⚡ Bolt Runner', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80' },
+    { id: '2', label: '🏔️ Trail Master', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80' },
+    { id: '3', label: '🐅 Sprint Speed', url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80' },
+    { id: '4', label: '🧘 Zen Cardio', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80' },
+    { id: '5', label: '👑 Gold Champ', url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=256&q=80' },
+  ];
+
+  const handleSelectPreset = async (url: string) => {
+    try {
+      await api.updateProfile({ avatarUrl: url });
+      onProfileUpdated();
+      setShowAvatarModal(false);
+    } catch (err) {
+      console.warn('Failed to update avatar', err);
+    }
+  };
+
+  const handleCustomPhotoSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 256;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          try {
+            await api.updateProfile({ avatarUrl: dataUrl });
+            onProfileUpdated();
+            setShowAvatarModal(false);
+          } catch (err) {
+            console.warn('Failed to save custom photo', err);
+          }
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Offline Sync Queue
   const [offlineCount, setOfflineCount] = useState<number>(0);
@@ -202,23 +271,42 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div
+            onClick={() => setShowAvatarModal(true)}
             style={{
-              width: '64px',
-              height: '64px',
+              position: 'relative',
+              width: '68px',
+              height: '68px',
               borderRadius: '50%',
               backgroundColor: 'var(--bg-elevated)',
               overflow: 'hidden',
-              border: '2px solid var(--accent-yellow)',
+              border: '2.5px solid var(--accent-yellow)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              cursor: 'pointer',
             }}
+            title="Change Avatar or Photo"
           >
             {profile?.avatarUrl ? (
               <img src={profile.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              <User size={32} color="var(--accent-yellow)" />
+              <User size={34} color="var(--accent-yellow)" />
             )}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                left: 0,
+                height: '22px',
+                backgroundColor: 'rgba(0,0,0,0.6)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Camera size={12} color="#ffffff" />
+            </div>
           </div>
 
           <div style={{ flex: 1 }}>
@@ -366,6 +454,50 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
           {/* Account Actions */}
           <div className="stride-card" style={{ padding: '8px 16px' }}>
+            <button
+              onClick={() => setShowAvatarModal(true)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 0',
+                background: 'none',
+                border: 'none',
+                borderBottom: '1px solid var(--border-subtle)',
+                color: 'var(--text-primary)',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <Camera size={18} color="var(--accent-yellow)" />
+              Change Avatar & Athlete Photo
+            </button>
+
+            <button
+              onClick={() => setShowPrivacyPolicy(true)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 0',
+                background: 'none',
+                border: 'none',
+                borderBottom: '1px solid var(--border-subtle)',
+                color: 'var(--text-primary)',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <ShieldCheck size={18} color="#10b981" />
+              Privacy Policy & Data Security
+            </button>
+
             <button
               onClick={onLogout}
               style={{
@@ -736,6 +868,207 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden File Input for Custom Athlete Photo */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleCustomPhotoSelected}
+      />
+
+      {/* Change Avatar & Photo Modal */}
+      {showAvatarModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 2600,
+            backgroundColor: 'rgba(0, 0, 0, 0.82)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+        >
+          <div
+            className="stride-card stride-modal-animate"
+            style={{ width: '100%', maxWidth: '420px', backgroundColor: 'var(--bg-surface)', padding: '24px', borderRadius: '20px' }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800 }}>Athlete Avatar & Photo</h3>
+              <button
+                onClick={() => setShowAvatarModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Custom Photo Upload Button */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                width: '100%',
+                padding: '16px',
+                borderRadius: 'var(--radius-lg)',
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                color: '#10b981',
+                border: '1.5px dashed #10b981',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                fontSize: '14px',
+                fontWeight: 800,
+                cursor: 'pointer',
+                marginBottom: '20px',
+              }}
+            >
+              <Upload size={18} />
+              Upload Photo from Gallery / Camera
+            </button>
+
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Or Choose Athletic Preset
+            </span>
+
+            {/* Presets Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '12px' }}>
+              {PRESET_AVATARS.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => handleSelectPreset(item.url)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '10px 6px',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-subtle)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <img
+                    src={item.url}
+                    alt={item.label}
+                    style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover' }}
+                  />
+                  <span style={{ fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>{item.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              className="btn btn-secondary"
+              onClick={() => setShowAvatarModal(false)}
+              style={{ width: '100%', marginTop: '20px', padding: '12px' }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Official Privacy Policy Modal */}
+      {showPrivacyPolicy && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 2600,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+        >
+          <div
+            className="stride-card stride-modal-animate"
+            style={{
+              width: '100%',
+              maxWidth: '460px',
+              maxHeight: '85vh',
+              backgroundColor: 'var(--bg-surface)',
+              padding: '24px',
+              borderRadius: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShieldCheck size={22} color="#10b981" />
+                <h3 style={{ fontSize: '18px', fontWeight: 800 }}>STRIDE Privacy & Security</h3>
+              </div>
+              <button
+                onClick={() => setShowPrivacyPolicy(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ overflowY: 'auto', flex: 1, paddingRight: '4px', fontSize: '13px', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+              <p style={{ marginBottom: '14px' }}>
+                At <strong>STRIDE</strong>, athlete privacy and performance integrity are foundational. We follow strict privacy-by-design standards:
+              </p>
+
+              <div style={{ marginBottom: '14px' }}>
+                <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '3px' }}>
+                  1. GPS & Location Tracking
+                </strong>
+                Location data is recorded strictly when you initiate an active stride (Run, Walk, Jog, Cycle, Hike). We never record location passively in the background when the workout is stopped.
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '3px' }}>
+                  2. Zero Commercial Data Selling
+                </strong>
+                Your running routes, coordinates, biometric data, and personal statistics will never be sold, leased, or transmitted to commercial advertising brokers.
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '3px' }}>
+                  3. Offline-First Privacy & Security
+                </strong>
+                All activity traces are stored encrypted in your local device SQLite/IndexedDB before syncing to the cloud API.
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '3px' }}>
+                  4. Compliance & Right to Erasure
+                </strong>
+                Compliant with Indian Information Technology Act 2000 and SPDI Rules 2011. You hold the permanent right to delete your profile and all historical GPS traces instantly from the Profile tab.
+              </div>
+
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', borderTop: '1px solid var(--border-subtle)', paddingTop: '10px' }}>
+                Direct Privacy Inquiries: <strong>privacy@stride.fitness</strong> • Version 1.0.4
+              </div>
+            </div>
+
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowPrivacyPolicy(false)}
+              style={{ width: '100%', marginTop: '16px', padding: '12px', fontSize: '14px' }}
+            >
+              Understood & Close
+            </button>
           </div>
         </div>
       )}

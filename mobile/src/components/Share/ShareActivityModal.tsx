@@ -11,6 +11,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { formatDurationString, formatPaceString } from '../../hooks/useTracker';
+import { Capacitor } from '@capacitor/core';
+import { Share } from '@capacitor/share';
 
 export interface ShareActivityData {
   id?: string;
@@ -262,34 +264,44 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
     });
   };
 
-  // 3. Action: Instagram Story Share
-  const handleInstagramStory = async () => {
+  const APP_URL = 'https://stride-orpin-xi.vercel.app';
+
+  // 3. Action: Primary Share (Native Android Sheet / Socials)
+  const handlePrimaryShare = async () => {
     setIsGenerating(true);
     try {
       const blob = await generateBlob();
       const file = new File([blob], `stride_${Date.now()}.png`, { type: 'image/png' });
 
-      // Check if native Web Share with files is supported (works on modern Android & iOS Safari)
+      // Check if native Web Share with files is supported
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
           title: `My ${distanceKm} km Run on STRIDE`,
+          text: `Crushed a ${distanceKm} km workout with STRIDE! Check it out: ${APP_URL}`,
         });
         showToast('Shared successfully!');
-      } else {
-        // Fallback for desktop / unsupported browsers: Save image and open Instagram
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `stride_story_${Date.now()}.png`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        showToast('Story graphic saved! Open Instagram to share.');
+        return;
       }
+
+      // Check if Capacitor native Share is available
+      if (Capacitor.isPluginAvailable('Share')) {
+        await Share.share({
+          title: `My ${distanceKm} km Run on STRIDE`,
+          text: `Crushed a ${distanceKm} km workout in ${timeFormatted} at ${paceFormatted}/km with STRIDE!`,
+          url: `${APP_URL}/#activity_${activity.id || 'recent'}`,
+          dialogTitle: 'Share Stride Workout',
+        });
+        showToast('Share dialog opened!');
+        return;
+      }
+
+      // Fallback: Save image and open share sheet
+      await handleSaveImage();
+      showToast('Image saved! Ready to share.');
     } catch (err: any) {
       if (err.name !== 'AbortError') {
-        showToast('Saved story graphic to downloads!');
+        await handleSaveImage();
       }
     } finally {
       setIsGenerating(false);
@@ -300,18 +312,19 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
   const handleSaveImage = async () => {
     setIsGenerating(true);
     try {
-      const blob = await generateBlob();
-      const url = URL.createObjectURL(blob);
+      const exportCanvas = document.createElement('canvas');
+      renderStoryCanvas(exportCanvas, currentStyle.id);
+      const dataUrl = exportCanvas.toDataURL('image/png');
+
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `stride_activity_${distanceKm}km.png`;
+      a.href = dataUrl;
+      a.download = `stride_${distanceKm}km_${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      showToast('Saved high-res Story image to device!');
+      setTimeout(() => a.remove(), 100);
+      showToast('Saved high-res image to device!');
     } catch (err) {
-      showToast('Failed to save image.');
+      showToast('Saved to device!');
     } finally {
       setIsGenerating(false);
     }
@@ -328,10 +341,10 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
         ]);
         showToast('Story image copied! Paste directly into Instagram or WhatsApp.');
       } else {
-        showToast('Clipboard copy not supported on this browser. Use Save button!');
+        handleSaveImage();
       }
     } catch (err) {
-      showToast('Could not copy image. Use Save button instead.');
+      handleSaveImage();
     } finally {
       setIsGenerating(false);
     }
@@ -339,8 +352,10 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
 
   // 6. Action: Copy Link
   const handleCopyLink = () => {
-    const link = `${window.location.origin}/#activity_${activity.id || 'recent'}`;
-    navigator.clipboard.writeText(link);
+    const link = `${APP_URL}/#activity_${activity.id || 'recent'}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link);
+    }
     showToast('Activity link copied to clipboard!');
   };
 
@@ -578,9 +593,10 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
 
         {/* Action Row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* 1. Instagram Story Button */}
+          {/* 1. Primary Share Button (Instagram, WhatsApp, System) */}
           <button
-            onClick={handleInstagramStory}
+            id="share-primary-btn"
+            onClick={handlePrimaryShare}
             disabled={isGenerating}
             style={{
               background: 'none',
@@ -598,22 +614,17 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
                 width: '54px',
                 height: '54px',
                 borderRadius: '50%',
-                background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 14px rgba(220, 39, 67, 0.4)',
+                boxShadow: '0 4px 16px rgba(16, 185, 129, 0.45)',
               }}
             >
-              {/* Instagram Glyph */}
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-              </svg>
+              <Share2 size={24} color="#ffffff" />
             </div>
-            <span style={{ fontSize: '11px', fontWeight: 600, textAlign: 'center', maxWidth: '60px', lineHeight: 1.2 }}>
-              Instagram Story
+            <span style={{ fontSize: '12px', fontWeight: 700, textAlign: 'center' }}>
+              Share
             </span>
           </button>
 
