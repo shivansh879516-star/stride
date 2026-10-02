@@ -10,6 +10,8 @@ import { ActivityDetailModal } from './screens/ActivityDetailModal';
 import { AuthModal } from './screens/AuthModal';
 import { NotificationsModal } from './screens/NotificationsModal';
 import { api, getToken, removeToken, UserProfile, ActivitySummary, ChallengeItem } from './services/api';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 export function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
@@ -31,9 +33,19 @@ export function App() {
   const [activeChallenge, setActiveChallenge] = useState<ChallengeItem | null>(null);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
 
-  // Initialize theme
+  // Initialize theme & native status bar
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    if (Capacitor.isPluginAvailable('StatusBar')) {
+      StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
+      if (theme === 'dark') {
+        StatusBar.setBackgroundColor({ color: '#111822' }).catch(() => {});
+        StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+      } else {
+        StatusBar.setBackgroundColor({ color: '#ffffff' }).catch(() => {});
+        StatusBar.setStyle({ style: Style.Light }).catch(() => {});
+      }
+    }
   }, [theme]);
 
   // Load User Data & Verify Session

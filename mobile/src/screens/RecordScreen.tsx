@@ -187,7 +187,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
         <div
           style={{
             position: 'absolute',
-            top: '12px',
+            top: 'calc(var(--safe-top, 0px) + 12px)',
             left: '12px',
             right: '12px',
             zIndex: 600,
