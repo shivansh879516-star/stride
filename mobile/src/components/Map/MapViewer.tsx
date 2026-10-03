@@ -427,7 +427,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             width: '46px',
             height: '46px',
             borderRadius: '50%',
-            backgroundColor: '#ffffff',
+            backgroundColor: 'var(--bg-card)',
             border: '2px solid rgba(16, 185, 129, 0.3)',
             boxShadow: '0 4px 16px rgba(16, 185, 129, 0.25)',
             display: 'flex',

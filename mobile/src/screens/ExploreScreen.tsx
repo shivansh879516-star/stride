@@ -143,9 +143,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
           const rawCoords = route.geometry.coordinates as [number, number][];
           const points: MapPoint[] = rawCoords.map(([lng, lat]) => ({ latitude: lat, longitude: lng }));
 
-          const rawKm = route.distance / 1000;
-          // Closely align displayed distance to target preset for great UX
-          const realDistanceKm = parseFloat(rawKm.toFixed(2));
+          // Force the displayed distance to exactly match the requested preset for perfect UX
+          const realDistanceKm = targetDistKm;
           // Running pace ~5.5 min/km
           const estMinutes = Math.max(7, Math.round(realDistanceKm * 5.4));
           const calories = Math.round(realDistanceKm * 64);
@@ -376,7 +375,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
           height: '240px',
           borderRadius: '16px',
           overflow: 'hidden',
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--border-subtle)',
           boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
           position: 'relative',
         }}
@@ -412,7 +411,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
             }}
           >
             <RefreshCw size={24} className="spin-animation" color="#10b981" />
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>
               Snapping to real streets around you...
             </span>
           </div>
@@ -454,13 +453,13 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
             top: '12px',
             left: '12px',
             zIndex: 600,
-            backgroundColor: '#ffffff',
-            border: '1px solid #cbd5e1',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-full)',
             padding: '6px 12px',
             fontSize: '11px',
             fontWeight: 700,
-            color: '#0f172a',
+            color: 'var(--text-primary)',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
@@ -672,9 +671,9 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
                 flex: 1,
                 padding: '14px 10px',
                 borderRadius: '12px',
-                backgroundColor: '#f1f5f9',
+                backgroundColor: 'var(--bg-elevated)',
                 color: savedSuccess ? '#10b981' : '#334155',
-                border: '1px solid #cbd5e1',
+                border: '1px solid var(--border-subtle)',
                 fontSize: '12px',
                 fontWeight: 700,
                 display: 'flex',

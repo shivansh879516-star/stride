@@ -241,7 +241,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             style={{
               fontSize: '15px',
               fontWeight: 800,
-              color: '#94a3b8',
+              color: 'var(--text-muted)',
               marginTop: '16px',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
@@ -290,13 +290,13 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                 width: '38px',
                 height: '38px',
                 borderRadius: '50%',
-                backgroundColor: '#ffffff',
+                backgroundColor: 'var(--bg-card)',
                 border: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
-                color: '#0f172a',
+                color: 'var(--text-primary)',
                 cursor: 'pointer',
               }}
               title="Back to Home"
@@ -308,7 +308,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
           {/* GPS Status Indicator */}
           <div
             style={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'var(--bg-card)',
               padding: '6px 12px',
               borderRadius: 'var(--radius-full)',
               display: 'flex',
@@ -327,7 +327,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                 boxShadow: tracker.gpsStatus === 'LOCKED' ? '0 0 6px #10b981' : 'none',
               }}
             />
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)' }}>
               GPS: {tracker.gpsStatus} {tracker.gpsAccuracy ? `(±${Math.round(tracker.gpsAccuracy)}m)` : ''}
             </span>
           </div>
@@ -338,7 +338,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             style={{
               border: 'none',
               color: hrSensor.isConnected ? '#ef4444' : '#334155',
-              backgroundColor: '#ffffff',
+              backgroundColor: 'var(--bg-card)',
               padding: '6px 12px',
               borderRadius: 'var(--radius-full)',
               cursor: 'pointer',
@@ -385,7 +385,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             {onClearSelectedRoute && (
               <button
                 onClick={onClearSelectedRoute}
-                style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', padding: 0 }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', padding: 0 }}
                 title="Dismiss Route"
               >
                 <X size={14} />
@@ -620,16 +620,16 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             {/* Primary Metrics: Distance & Elapsed Time */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   DISTANCE (KM)
                 </span>
-                <div className="metric-value" style={{ fontSize: '38px', lineHeight: 1.1, color: '#0f172a', marginTop: '2px' }}>
+                <div className="metric-value" style={{ fontSize: '38px', lineHeight: 1.1, color: 'var(--text-primary)', marginTop: '2px' }}>
                   {(tracker.totalDistanceMeters / 1000).toFixed(2)}
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   DURATION
                 </span>
                 <div className="metric-value" style={{ fontSize: '38px', lineHeight: 1.1, color: '#10b981', marginTop: '2px' }}>
@@ -641,7 +641,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             {/* Target Distance Goal Progress Bar */}
             {tracker.targetDistanceMeters && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
                   <span>Goal: {(tracker.targetDistanceMeters / 1000).toFixed(1)} km</span>
                   <span style={{ color: '#10b981' }}>{targetPercent}% ({Math.max(0, (tracker.targetDistanceMeters - tracker.totalDistanceMeters) / 1000).toFixed(2)} km left)</span>
                 </div>
@@ -671,29 +671,29 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
               }}
             >
               <div>
-                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700 }}>PACE</span>
-                <div className="metric-value" style={{ fontSize: '15px', marginTop: '2px', color: '#0f172a' }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700 }}>PACE</span>
+                <div className="metric-value" style={{ fontSize: '15px', marginTop: '2px', color: 'var(--text-primary)' }}>
                   {formatPaceString(tracker.averagePaceSec)}
                 </div>
               </div>
 
               <div>
-                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700 }}>SPEED</span>
-                <div className="metric-value" style={{ fontSize: '15px', marginTop: '2px', color: '#0f172a' }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700 }}>SPEED</span>
+                <div className="metric-value" style={{ fontSize: '15px', marginTop: '2px', color: 'var(--text-primary)' }}>
                   {tracker.currentSpeedKmh.toFixed(1)}
-                  <span style={{ fontSize: '9px', color: '#94a3b8' }}> km/h</span>
+                  <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}> km/h</span>
                 </div>
               </div>
 
               <div>
-                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700 }}>CALORIES</span>
-                <div className="metric-value" style={{ fontSize: '15px', marginTop: '2px', color: '#0f172a' }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700 }}>CALORIES</span>
+                <div className="metric-value" style={{ fontSize: '15px', marginTop: '2px', color: 'var(--text-primary)' }}>
                   {tracker.caloriesBurned}
                 </div>
               </div>
 
               <div>
-                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 700 }}>CLIMB</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700 }}>CLIMB</span>
                 <div className="metric-value" style={{ fontSize: '15px', marginTop: '2px', color: '#10b981' }}>
                   +{Math.round(tracker.elevationGainM)}m
                 </div>
@@ -747,7 +747,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '10px', color: '#64748b' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '10px', color: 'var(--text-muted)' }}>
                   <span>{tracker.audioCoachEnabled ? '🔊 Audio on' : '🔇 Audio off'}</span>
                   <span>•</span>
                   <span>{tracker.autoPauseEnabled ? 'Auto-pause on' : 'Manual'}</span>
@@ -756,17 +756,17 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
 
               {/* Splits List (Expandable) */}
               {showSplitsDrawer && (
-                <div style={{ marginTop: '8px', maxHeight: '100px', overflowY: 'auto', backgroundColor: '#f8fafc', borderRadius: '8px', padding: '6px 10px' }}>
+                <div style={{ marginTop: '8px', maxHeight: '100px', overflowY: 'auto', backgroundColor: 'var(--bg-card)', borderRadius: '8px', padding: '6px 10px' }}>
                   {tracker.splits.length === 0 ? (
-                    <div style={{ fontSize: '11px', color: '#94a3b8', textAlign: 'center', padding: '6px 0' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center', padding: '6px 0' }}>
                       First split will record at 1.0 km mark.
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       {tracker.splits.map((s) => (
                         <div key={s.splitNumber} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
-                          <span style={{ fontWeight: 600, color: '#475569' }}>KM {s.splitNumber}</span>
-                          <span className="metric-value" style={{ fontWeight: 700, color: '#0f172a' }}>{s.paceFormatted} /km</span>
+                          <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>KM {s.splitNumber}</span>
+                          <span className="metric-value" style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{s.paceFormatted} /km</span>
                         </div>
                       ))}
                     </div>
@@ -776,7 +776,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
 
               {/* Live Pace Chart (Expandable) */}
               {showChartDrawer && (
-                <div style={{ marginTop: '8px', backgroundColor: '#ffffff', borderRadius: '12px', padding: '10px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div style={{ marginTop: '8px', backgroundColor: 'var(--bg-card)', borderRadius: '12px', padding: '10px', border: '1px solid var(--border-subtle)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                   <PaceAreaChart
                     points={tracker.points}
                     splits={tracker.splits}
@@ -826,9 +826,9 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                       borderRadius: 'var(--radius-lg)',
                       fontSize: '13px',
                       fontWeight: 800,
-                      backgroundColor: '#f1f5f9',
-                      color: '#334155',
-                      border: '1px solid #cbd5e1',
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border-subtle)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -941,7 +941,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
               overflowY: 'auto',
               borderRadius: '24px 24px 0 0',
               padding: '24px 20px 40px',
-              backgroundColor: '#ffffff',
+              backgroundColor: 'var(--bg-card)',
               boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.2)',
             }}
           >
@@ -962,15 +962,15 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
               >
                 <Sparkles size={14} /> STRIDE COMPLETE
               </div>
-              <h2 style={{ fontSize: '26px', fontWeight: 800, marginTop: '8px', color: '#0f172a' }}>
+              <h2 style={{ fontSize: '26px', fontWeight: 800, marginTop: '8px', color: 'var(--text-primary)' }}>
                 Outstanding effort!
               </h2>
-              <p style={{ fontSize: '13px', color: '#64748b' }}>Ready to sync and share with community.</p>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Ready to sync and share with community.</p>
             </div>
 
             {/* Title Input */}
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+              <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
                 Activity Title
               </label>
               <input
@@ -983,9 +983,9 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                   marginTop: '6px',
                   padding: '12px 16px',
                   borderRadius: 'var(--radius-md)',
-                  backgroundColor: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  color: '#0f172a',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
                   fontSize: '15px',
                   fontWeight: 600,
                   outline: 'none',
@@ -1001,7 +1001,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                 borderRadius: 'var(--radius-md)',
                 overflow: 'hidden',
                 marginBottom: '16px',
-                border: '1px solid #e2e8f0',
+                border: '1px solid var(--border-subtle)',
               }}
             >
               <MapViewer
@@ -1024,15 +1024,15 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                 marginBottom: '16px',
               }}
             >
-              <div className="stride-card" style={{ padding: '14px', backgroundColor: '#f8fafc' }}>
-                <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>DISTANCE</span>
-                <div className="metric-value" style={{ fontSize: '26px', marginTop: '2px', color: '#0f172a' }}>
+              <div className="stride-card" style={{ padding: '14px', backgroundColor: 'var(--bg-card)' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>DISTANCE</span>
+                <div className="metric-value" style={{ fontSize: '26px', marginTop: '2px', color: 'var(--text-primary)' }}>
                   {(tracker.totalDistanceMeters / 1000).toFixed(2)} km
                 </div>
               </div>
 
-              <div className="stride-card" style={{ padding: '14px', backgroundColor: '#f8fafc' }}>
-                <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>TIME</span>
+              <div className="stride-card" style={{ padding: '14px', backgroundColor: 'var(--bg-card)' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>TIME</span>
                 <div className="metric-value" style={{ fontSize: '26px', marginTop: '2px', color: '#10b981' }}>
                   {formatDurationString(tracker.elapsedDurationSec)}
                 </div>
@@ -1040,7 +1040,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             </div>
 
             {/* Pace Area Chart in Completion Modal */}
-            <div className="stride-card" style={{ padding: '18px 16px', marginBottom: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
+            <div className="stride-card" style={{ padding: '18px 16px', marginBottom: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <h4 style={{ fontSize: '16px', fontWeight: 800 }}>Pace Breakdown</h4>
                 <Info size={16} color="#94a3b8" />
@@ -1057,15 +1057,15 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #f1f5f9', fontSize: '13px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#64748b' }}>Avg Pace</span>
+                  <span style={{ color: 'var(--text-muted)' }}>Avg Pace</span>
                   <span className="metric-value" style={{ fontWeight: 700 }}>{formatPaceString(tracker.averagePaceSec)} /km</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#64748b' }}>Moving Time</span>
+                  <span style={{ color: 'var(--text-muted)' }}>Moving Time</span>
                   <span className="metric-value" style={{ fontWeight: 700 }}>{formatDurationString(tracker.movingDurationSec || tracker.elapsedDurationSec)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#64748b' }}>Elapsed Time</span>
+                  <span style={{ color: 'var(--text-muted)' }}>Elapsed Time</span>
                   <span className="metric-value" style={{ fontWeight: 700 }}>{formatDurationString(tracker.elapsedDurationSec)}</span>
                 </div>
               </div>

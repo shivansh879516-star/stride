@@ -366,7 +366,14 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
       const blob = await generateBlob();
       const file = new File([blob], `stride_${distanceKm}km.png`, { type: 'image/png' });
 
-      if (navigator.share) {
+      if (Capacitor.isPluginAvailable('Share')) {
+        await Share.share({
+          title: `STRIDE Workout: ${distanceKm} km in ${timeFormatted}`,
+          text: `Crushed a ${distanceKm} km ${activity.activityType || 'Run'} at ${paceFormatted}/km with STRIDE!`,
+          url: `https://stride-fitness.com/#activity_${activity.id || 'recent'}`,
+          dialogTitle: 'Share your Stride',
+        });
+      } else if (navigator.share) {
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],

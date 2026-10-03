@@ -557,17 +557,17 @@ export const ProgressScreen: React.FC = () => {
                     </div>
 
                     <div>
-                      <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>
+                      <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
                         {entry.firstName ? `${entry.firstName} ${entry.lastName || ''}` : entry.username}
                       </h4>
-                      <span style={{ fontSize: '11px', color: '#64748b' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                         Level {entry.level} • {entry.streak}d streak
                       </span>
                     </div>
                   </div>
 
                   <div className="metric-value" style={{ fontSize: '16px', color: '#10b981', fontWeight: 800 }}>
-                    {entry.score} <span style={{ fontSize: '11px', color: '#64748b' }}>{entry.unit}</span>
+                    {entry.score} <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{entry.unit}</span>
                   </div>
                 </div>
               );

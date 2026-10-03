@@ -445,3 +445,10 @@ button:active:not(:disabled), a:active, [role="button"]:active {
   100% { opacity: 1; transform: scale(1); }
 }
 
+[data-theme='dark'] .leaflet-layer,
+[data-theme='dark'] .leaflet-control-zoom-in,
+[data-theme='dark'] .leaflet-control-zoom-out,
+[data-theme='dark'] .leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+

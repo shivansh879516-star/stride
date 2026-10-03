@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Trash2, Calendar, Clock, Flame, TrendingUp, Zap, ChevronRight, Share2, Info, Compass } from 'lucide-react';
 import { MapViewer } from '../components/Map/MapViewer';
 import { PaceAreaChart } from '../components/Charts/PaceAreaChart';
-import { api, ActivitySummary } from '../services/api';
+import { api, ActivitySummary, API_BASE } from '../services/api';
 import { formatPaceString, formatDurationString } from '../hooks/useTracker';
 import { ShareActivityModal } from '../components/Share/ShareActivityModal';
 
@@ -53,7 +53,7 @@ export const ActivityDetailModal: React.FC<ActivityDetailModalProps> = ({
 
   const handleDownloadGpx = () => {
     const token = localStorage.getItem('stride_auth_token');
-    const url = `/api/activities/${activityId}/gpx`;
+    const url = `${API_BASE}/activities/${activityId}/gpx`;
     fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     })

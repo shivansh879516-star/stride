@@ -256,7 +256,7 @@ export const PaceAreaChart: React.FC<PaceAreaChartProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>Pace & Speed Timeline</span>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)' }}>Pace & Speed Timeline</span>
           <span
             style={{
               fontSize: '10px',
@@ -278,7 +278,7 @@ export const PaceAreaChart: React.FC<PaceAreaChartProps> = ({
         <div
           style={{
             display: 'flex',
-            backgroundColor: '#f1f5f9',
+            backgroundColor: 'var(--bg-elevated)',
             padding: '2px',
             borderRadius: '8px',
             gap: '2px',
@@ -576,7 +576,7 @@ export const PaceAreaChart: React.FC<PaceAreaChartProps> = ({
           style={{
             textAlign: 'center',
             fontSize: '9.5px',
-            color: '#94a3b8',
+            color: 'var(--text-muted)',
             fontWeight: 700,
             letterSpacing: '0.05em',
             textTransform: 'uppercase',
@@ -594,7 +594,7 @@ export const PaceAreaChart: React.FC<PaceAreaChartProps> = ({
           alignItems: 'center',
           gap: '4px',
           fontSize: '11px',
-          color: '#94a3b8',
+          color: 'var(--text-muted)',
           marginTop: '6px',
           justifyContent: 'center',
         }}
