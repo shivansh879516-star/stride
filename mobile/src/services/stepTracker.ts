@@ -19,6 +19,7 @@ interface NativeStepPlugin {
     date: string;
   }>;
   checkSensor(): Promise<{ hasSensor: boolean }>;
+  requestPermission(): Promise<{ granted: boolean; hasSensor: boolean }>;
 }
 
 const NativeStepCounter = registerPlugin<NativeStepPlugin>('StepCounter');
@@ -37,7 +38,10 @@ class StepTrackerService {
   }
 
   private init() {
-    // 1. Read cached steps for today from localStorage
+    // 1. Request native step permission if running on Android
+    NativeStepCounter.requestPermission().catch(() => {});
+
+    // 2. Read cached steps for today from localStorage
     try {
       const todayKey = new Date().toISOString().split('T')[0];
       const savedDate = localStorage.getItem('stride_steps_date');
@@ -58,7 +62,7 @@ class StepTrackerService {
       }
     } catch {}
 
-    // 2. Poll Native Hardware Step Counter every 3 seconds
+    // 3. Poll Native Hardware Step Counter every 3 seconds
     this.syncNativeSteps();
     this.pollInterval = setInterval(() => {
       this.syncNativeSteps();

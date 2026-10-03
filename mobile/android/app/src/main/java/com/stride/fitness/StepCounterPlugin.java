@@ -1,21 +1,32 @@
 package com.stride.fitness;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
+import androidx.core.content.ContextCompat;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-@CapacitorPlugin(name = "StepCounter")
+@CapacitorPlugin(
+    name = "StepCounter",
+    permissions = {
+        @Permission(strings = { Manifest.permission.ACTIVITY_RECOGNITION }, alias = "activity")
+    }
+)
 public class StepCounterPlugin extends Plugin implements SensorEventListener {
 
     private SensorManager sensorManager;
@@ -29,9 +40,15 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
     @Override
     public void load() {
         super.load();
+        registerSensorIfNeeded();
+    }
+
+    private synchronized void registerSensorIfNeeded() {
         try {
-            sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
-            if (sensorManager != null) {
+            if (sensorManager == null) {
+                sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+            }
+            if (sensorManager != null && stepSensor == null) {
                 stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
                 if (stepSensor != null) {
                     sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL);
@@ -83,6 +100,8 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
     @PluginMethod
     public void getTodaySteps(PluginCall call) {
         try {
+            registerSensorIfNeeded();
+
             SharedPreferences prefs = getContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
             String todayStr = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
             String savedDate = prefs.getString(KEY_DATE, "");
@@ -109,7 +128,36 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
     }
 
     @PluginMethod
+    public void requestPermission(PluginCall call) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionForAlias("activity", call, "permissionCallback");
+                return;
+            }
+        }
+        registerSensorIfNeeded();
+        JSObject ret = new JSObject();
+        ret.put("granted", true);
+        ret.put("hasSensor", stepSensor != null);
+        call.resolve(ret);
+    }
+
+    @PermissionCallback
+    private void permissionCallback(PluginCall call) {
+        registerSensorIfNeeded();
+        JSObject ret = new JSObject();
+        boolean granted = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            granted = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED;
+        }
+        ret.put("granted", granted);
+        ret.put("hasSensor", stepSensor != null);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
     public void checkSensor(PluginCall call) {
+        registerSensorIfNeeded();
         JSObject ret = new JSObject();
         ret.put("hasSensor", stepSensor != null);
         call.resolve(ret);
