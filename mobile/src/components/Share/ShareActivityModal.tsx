@@ -353,7 +353,7 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
 
   // 6. Action: Copy Link
   const handleCopyLink = () => {
-    const link = `${APP_URL}/#activity_${activity.id || 'recent'}`;
+    const link = `https://stride-fitness.com/#activity_${activity.id || 'recent'}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(link);
     }
@@ -377,7 +377,7 @@ export const ShareActivityModal: React.FC<ShareActivityModalProps> = ({
           await navigator.share({
             title: `STRIDE: ${distanceKm} km Run`,
             text: `Crushed ${distanceKm} km in ${timeFormatted}!`,
-            url: window.location.href,
+            url: `https://stride-fitness.com/#activity_${activity.id || 'recent'}`,
           });
         }
       } else {

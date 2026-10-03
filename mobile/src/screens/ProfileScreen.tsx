@@ -90,45 +90,42 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = async () => {
-        const canvas = document.createElement('canvas');
-        const maxDim = 160;
-        let width = img.width;
-        let height = img.height;
-        if (width > height) {
-          if (width > maxDim) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          }
-        } else {
-          if (height > maxDim) {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
+    const img = new Image();
+    img.onload = async () => {
+      const canvas = document.createElement('canvas');
+      const maxDim = 160;
+      let width = img.width;
+      let height = img.height;
+      if (width > height) {
+        if (width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
         }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-          setCurrentAvatar(dataUrl);
-          localStorage.setItem('stride_athlete_avatar', dataUrl);
-          setShowAvatarModal(false);
-          try {
-            await api.updateProfile({ avatarUrl: dataUrl });
-            onProfileUpdated();
-          } catch (err) {
-            console.warn('Background photo sync failed', err);
-          }
+      } else {
+        if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
         }
-      };
-      img.src = event.target?.result as string;
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        setCurrentAvatar(dataUrl);
+        localStorage.setItem('stride_athlete_avatar', dataUrl);
+        setShowAvatarModal(false);
+        try {
+          await api.updateProfile({ avatarUrl: dataUrl });
+          onProfileUpdated();
+        } catch (err) {
+          console.warn('Background photo sync failed', err);
+        }
+      }
+      URL.revokeObjectURL(img.src);
     };
-    reader.readAsDataURL(file);
+    img.src = URL.createObjectURL(file);
   };
 
   // Offline Sync Queue
@@ -255,7 +252,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     try {
       const res = await api.generateLiveShare({ durationHours: 4 });
       setActiveShareToken(res.shareToken);
-      const fullUrl = `${window.location.origin}${res.shareUrl}`;
+      const fullUrl = `https://stride-fitness.com${res.shareUrl}`;
       navigator.clipboard?.writeText(fullUrl);
       alert(`Temporary live safety tracking link copied to clipboard!\n\n${fullUrl}`);
     } catch (e: any) {

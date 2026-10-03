@@ -30,7 +30,7 @@ export const ProgressScreen: React.FC = () => {
   const [inviteCopied, setInviteCopied] = useState(false);
 
   const handleInviteFriends = async () => {
-    const inviteUrl = `${window.location.origin}/#join_leaderboard`;
+    const inviteUrl = `https://stride-fitness.com/#join_leaderboard`;
     const shareText = `🏃 Join my running leaderboard on STRIDE! Track your runs, walk with me, and let's see who tops this week's ranking:\n${inviteUrl}`;
 
     if (navigator.share) {

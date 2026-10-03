@@ -404,7 +404,7 @@ h1, h2, h3, h4 {
 }
 
 .stride-animate-in {
-  animation: strideFadeSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: strideFadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   will-change: opacity, transform;
 }
 
@@ -425,5 +425,23 @@ button:active:not(:disabled), a:active, [role="button"]:active {
 
 .stride-card {
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+@keyframes strideFadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes strideCountdownPop {
+  0% { opacity: 0; transform: scale(0.6) translateY(20px); }
+  30% { opacity: 1; transform: scale(1.1) translateY(-10px); }
+  60% { transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
