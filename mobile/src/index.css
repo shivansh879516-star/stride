@@ -45,17 +45,17 @@
 }
 
 [data-theme='dark'] {
-  --bg-base: #0b0f14;
-  --bg-surface: #111822;
-  --bg-card: #182230;
-  --bg-card-hover: #1f2d3f;
-  --bg-elevated: #243347;
-  --border-subtle: rgba(255, 255, 255, 0.09);
+  --bg-base: #090d14;
+  --bg-surface: #0f1622;
+  --bg-card: #131c2b;
+  --bg-card-hover: #1a2538;
+  --bg-elevated: #1b2638;
+  --border-subtle: rgba(255, 255, 255, 0.08);
   --border-focus: rgba(16, 185, 129, 0.5);
 
   --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-secondary: #cbd5e1;
+  --text-muted: #8292a8;
 
   --accent-yellow: #10b981;
   --accent-yellow-hover: #059669;
@@ -351,19 +351,19 @@ h1, h2, h3, h4 {
 /* ======================================================== */
 @keyframes strideFadeSlideUp {
   0% {
-    opacity: 0;
-    transform: translateY(16px) scale(0.985);
+    opacity: 0.65;
+    transform: translate3d(0, 4px, 0);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 @keyframes strideScaleIn {
   0% {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(0.96);
   }
   100% {
     opacity: 1;
@@ -399,7 +399,8 @@ h1, h2, h3, h4 {
 }
 
 .stride-animate-in {
-  animation: strideFadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: strideFadeSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
 }
 
 .stride-modal-animate {

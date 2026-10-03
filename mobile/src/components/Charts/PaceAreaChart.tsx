@@ -293,9 +293,9 @@ export const PaceAreaChart: React.FC<PaceAreaChartProps> = ({
               borderRadius: '6px',
               border: 'none',
               cursor: 'pointer',
-              backgroundColor: activeMode === 'PACE' ? '#ffffff' : 'transparent',
-              color: activeMode === 'PACE' ? '#10b981' : '#64748b',
-              boxShadow: activeMode === 'PACE' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              backgroundColor: activeMode === 'PACE' ? 'var(--bg-surface)' : 'transparent',
+              color: activeMode === 'PACE' ? '#10b981' : 'var(--text-muted)',
+              boxShadow: activeMode === 'PACE' ? 'var(--shadow-sm)' : 'none',
               transition: 'all 0.15s ease',
             }}
           >
@@ -310,9 +310,9 @@ export const PaceAreaChart: React.FC<PaceAreaChartProps> = ({
               borderRadius: '6px',
               border: 'none',
               cursor: 'pointer',
-              backgroundColor: activeMode === 'SPEED' ? '#ffffff' : 'transparent',
-              color: activeMode === 'SPEED' ? '#10b981' : '#64748b',
-              boxShadow: activeMode === 'SPEED' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              backgroundColor: activeMode === 'SPEED' ? 'var(--bg-surface)' : 'transparent',
+              color: activeMode === 'SPEED' ? '#10b981' : 'var(--text-muted)',
+              boxShadow: activeMode === 'SPEED' ? 'var(--shadow-sm)' : 'none',
               transition: 'all 0.15s ease',
             }}
           >
@@ -333,47 +333,47 @@ export const PaceAreaChart: React.FC<PaceAreaChartProps> = ({
         <div
           style={{
             padding: '8px 10px',
-            backgroundColor: '#f8fafc',
+            backgroundColor: 'var(--bg-elevated)',
             borderRadius: '10px',
-            border: '1px solid #f1f5f9',
+            border: '1px solid var(--border-subtle)',
           }}
         >
-          <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
             ⚡ Best Pace
           </div>
           <div style={{ fontSize: '15px', fontWeight: 800, color: '#10b981', marginTop: '2px' }}>
-            {formatPace(bestPaceSec)} <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>/km</span>
+            {formatPace(bestPaceSec)} <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)' }}>/km</span>
           </div>
         </div>
 
         <div
           style={{
             padding: '8px 10px',
-            backgroundColor: '#f8fafc',
+            backgroundColor: 'var(--bg-elevated)',
             borderRadius: '10px',
-            border: '1px solid #f1f5f9',
+            border: '1px solid var(--border-subtle)',
           }}
         >
-          <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
             ⏱️ Avg Pace
           </div>
-          <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
-            {formatPace(safeAvgPace)} <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>/km</span>
+          <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
+            {formatPace(safeAvgPace)} <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)' }}>/km</span>
           </div>
         </div>
 
         <div
           style={{
             padding: '8px 10px',
-            backgroundColor: '#f8fafc',
+            backgroundColor: 'var(--bg-elevated)',
             borderRadius: '10px',
-            border: '1px solid #f1f5f9',
+            border: '1px solid var(--border-subtle)',
           }}
         >
-          <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
             🕒 Total Time
           </div>
-          <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
+          <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
             {totalTimeFormatted}
           </div>
         </div>
@@ -384,21 +384,22 @@ export const PaceAreaChart: React.FC<PaceAreaChartProps> = ({
         <div
           style={{
             padding: '6px 12px',
-            backgroundColor: '#0f172a',
-            color: '#ffffff',
+            backgroundColor: 'var(--bg-elevated)',
+            color: 'var(--text-primary)',
             borderRadius: '8px',
+            border: '1px solid var(--border-subtle)',
             fontSize: '11px',
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             marginBottom: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            boxShadow: 'var(--shadow-sm)',
             animation: 'fadeIn 0.15s ease',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Clock size={12} color="#94a3b8" />
+            <Clock size={12} color="var(--text-muted)" />
             <span>Time: {activePt.data.timeFormatted}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -412,9 +413,9 @@ export const PaceAreaChart: React.FC<PaceAreaChartProps> = ({
       <div
         style={{
           width: '100%',
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--bg-card)',
           borderRadius: '12px',
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--border-subtle)',
           padding: '8px 4px 4px 0',
           position: 'relative',
           touchAction: 'none',

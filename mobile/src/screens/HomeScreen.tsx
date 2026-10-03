@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Flame, Play, ChevronRight, Award, Zap, Clock, Route, Compass, ThumbsUp, MessageSquare, Share2, Medal, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Flame, Play, ChevronRight, Award, Zap, Clock, Route, Compass, ThumbsUp, MessageSquare, Share2, Medal, User, Footprints } from 'lucide-react';
 import { ActivitySummary, UserProfile, ChallengeItem } from '../services/api';
 import { MapViewer } from '../components/Map/MapViewer';
 import { ShareActivityModal } from '../components/Share/ShareActivityModal';
 import { soundEngine } from '../services/audio';
+import { stepTracker, StepData } from '../services/stepTracker';
 
 interface HomeScreenProps {
   profile: UserProfile | null;
@@ -27,15 +28,36 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onViewAchievements,
 }) => {
   const [sharingActivity, setSharingActivity] = useState<any | null>(null);
-  const [hypeGiven, setHypeGiven] = useState<Record<string, number>>({});
+  const [hypeGiven, setHypeGiven] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem('stride_hype_store');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [hypeToast, setHypeToast] = useState<string | null>(null);
+  const [stepData, setStepData] = useState<StepData>(() => stepTracker.getSnapshot());
+
+  useEffect(() => {
+    const unsub = stepTracker.subscribe((data) => {
+      setStepData(data);
+    });
+    return unsub;
+  }, []);
 
   const handleGiveHype = (actId: string) => {
     soundEngine.playJosh();
-    setHypeGiven((prev) => ({
-      ...prev,
-      [actId]: (prev[actId] || 0) + 1,
-    }));
+    setHypeGiven((prev) => {
+      const updated = {
+        ...prev,
+        [actId]: (prev[actId] || 0) + 1,
+      };
+      try {
+        localStorage.setItem('stride_hype_store', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
     setHypeToast('Full Hype! ⚡ Athlete in the zone!');
     setTimeout(() => setHypeToast(null), 2200);
   };
@@ -187,6 +209,121 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
+      {/* 24/7 Step Tracker Card (Always Running Hardware Pedometer) */}
+      <div
+        className="stride-card"
+        style={{
+          background: 'linear-gradient(145deg, var(--bg-card), var(--bg-surface))',
+          padding: '20px',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-sm)',
+          position: 'relative',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Footprints size={15} color="#10b981" />
+              <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                24/7 Step Tracker
+              </span>
+              <span
+                style={{
+                  fontSize: '9px',
+                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                  color: '#059669',
+                  padding: '2px 6px',
+                  borderRadius: 'var(--radius-full)',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                }}
+              >
+                <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }} />
+                ACTIVE
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '4px' }}>
+              <span className="metric-value" style={{ fontSize: '32px', color: 'var(--text-primary)' }}>
+                {stepData.steps.toLocaleString()}
+              </span>
+              <span style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 600 }}>
+                / {stepData.goal.toLocaleString()} steps
+              </span>
+            </div>
+          </div>
+
+          {/* Circular Progress Gauge */}
+          <div style={{ position: 'relative', width: '54px', height: '54px' }}>
+            <svg viewBox="0 0 36 36" style={{ width: '54px', height: '54px', transform: 'rotate(-90deg)' }}>
+              <path
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke="var(--bg-elevated)"
+                strokeWidth="3.5"
+              />
+              <path
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke="#10b981"
+                strokeWidth="3.5"
+                strokeDasharray={`${Math.min(100, Math.round((stepData.steps / stepData.goal) * 100))}, 100`}
+                strokeLinecap="round"
+              />
+            </svg>
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '11px',
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 800,
+                color: 'var(--text-primary)',
+              }}
+            >
+              {Math.min(100, Math.round((stepData.steps / stepData.goal) * 100))}%
+            </div>
+          </div>
+        </div>
+
+        {/* 3 Metrics: Distance, Calories, Active Time */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '8px',
+            backgroundColor: 'var(--bg-elevated)',
+            padding: '10px',
+            borderRadius: '12px',
+            textAlign: 'center',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Distance</div>
+            <div className="metric-value" style={{ fontSize: '15px', color: 'var(--text-primary)', marginTop: '2px' }}>
+              {stepData.distanceKm} km
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Burn</div>
+            <div className="metric-value" style={{ fontSize: '15px', color: 'var(--text-primary)', marginTop: '2px' }}>
+              {stepData.calories} kcal
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Active</div>
+            <div className="metric-value" style={{ fontSize: '15px', color: 'var(--text-primary)', marginTop: '2px' }}>
+              {stepData.activeMinutes} min
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Quick Stride CTA */}
       <button
         id="home-quick-record-btn"
@@ -311,7 +448,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   className="stride-card"
                   style={{
                     padding: '18px 16px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-subtle)',
                     boxShadow: 'var(--shadow-sm)',
                     display: 'flex',
                     flexDirection: 'column',
@@ -325,7 +463,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                         width: '38px',
                         height: '38px',
                         borderRadius: '50%',
-                        backgroundColor: '#f0f2f5',
+                        backgroundColor: 'var(--bg-elevated)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

@@ -425,8 +425,8 @@ export const ProgressScreen: React.FC = () => {
             className="stride-card"
             style={{
               padding: '16px',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: '16px',
             }}
           >
@@ -445,11 +445,11 @@ export const ProgressScreen: React.FC = () => {
               >
                 <Trophy size={15} />
               </div>
-              <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>
                 How Leaderboards Work
               </h3>
             </div>
-            <p style={{ fontSize: '12px', color: '#64748b', lineHeight: 1.4 }}>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.4 }}>
               Har GPS run aur walk automatically calculate hoti hai. Sabhi athletes ki weekly distance aur XP points se rank banti hai. Top 3 athletes ko Gold 🥇, Silver 🥈 aur Bronze 🥉 podium milta hai!
             </p>
 
@@ -490,13 +490,13 @@ export const ProgressScreen: React.FC = () => {
                 padding: '10px',
                 borderRadius: '10px',
                 border: 'none',
-                backgroundColor: leaderboardType === 'distance' ? '#10b981' : '#ffffff',
-                color: leaderboardType === 'distance' ? '#ffffff' : '#64748b',
+                backgroundColor: leaderboardType === 'distance' ? '#10b981' : 'var(--bg-card)',
+                color: leaderboardType === 'distance' ? '#ffffff' : 'var(--text-muted)',
                 fontSize: '12px',
                 fontWeight: 800,
                 cursor: 'pointer',
                 boxShadow: leaderboardType === 'distance' ? '0 2px 8px rgba(16, 185, 129, 0.25)' : 'none',
-                borderBottom: leaderboardType === 'distance' ? 'none' : '1px solid #e2e8f0',
+                borderBottom: leaderboardType === 'distance' ? 'none' : '1px solid var(--border-subtle)',
               }}
             >
               🏃 Distance Leaderboard
@@ -508,13 +508,13 @@ export const ProgressScreen: React.FC = () => {
                 padding: '10px',
                 borderRadius: '10px',
                 border: 'none',
-                backgroundColor: leaderboardType === 'xp' ? '#10b981' : '#ffffff',
-                color: leaderboardType === 'xp' ? '#ffffff' : '#64748b',
+                backgroundColor: leaderboardType === 'xp' ? '#10b981' : 'var(--bg-card)',
+                color: leaderboardType === 'xp' ? '#ffffff' : 'var(--text-muted)',
                 fontSize: '12px',
                 fontWeight: 800,
                 cursor: 'pointer',
                 boxShadow: leaderboardType === 'xp' ? '0 2px 8px rgba(16, 185, 129, 0.25)' : 'none',
-                borderBottom: leaderboardType === 'xp' ? 'none' : '1px solid #e2e8f0',
+                borderBottom: leaderboardType === 'xp' ? 'none' : '1px solid var(--border-subtle)',
               }}
             >
               ⚡ XP Rankings
@@ -535,8 +535,8 @@ export const ProgressScreen: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '12px 16px',
-                    backgroundColor: '#ffffff',
-                    border: isTop3 ? '1.5px solid rgba(16, 185, 129, 0.35)' : '1px solid #e2e8f0',
+                    backgroundColor: 'var(--bg-card)',
+                    border: isTop3 ? '1.5px solid rgba(16, 185, 129, 0.45)' : '1px solid var(--border-subtle)',
                     borderRadius: '12px',
                   }}
                 >

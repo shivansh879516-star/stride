@@ -114,8 +114,12 @@ class SoundEngine {
   }
 
   /**
-   * Josh / Celebration Click
+   * Hype / Celebration Click
    */
+  playHype() {
+    this.playJosh();
+  }
+
   playJosh() {
     const ctx = this.getContext();
     if (!ctx) return;

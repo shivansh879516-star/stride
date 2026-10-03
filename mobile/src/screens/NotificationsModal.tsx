@@ -22,7 +22,37 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
     setLoading(true);
     try {
       const res = await api.getNotifications();
-      setNotifications(res.notifications || []);
+      let list = res.notifications || [];
+      if (list.length <= 1) {
+        list = [
+          ...list,
+          {
+            id: 'notif_hinglish_1',
+            title: 'Bhai uth ja! 🏃‍♂️🔥',
+            message: 'Subah ki taazi hawa aur 5k stride wait kar rahi hai. Bed chhod aur warm up shuru kar!',
+            type: 'CHALLENGE',
+            read: false,
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: 'notif_hinglish_2',
+            title: 'Hydration & Mindset Check 💧',
+            message: 'Screen chhod, paani pi athlete! Aur bata, aaj kitne km ka target set kiya hai?',
+            type: 'INFO',
+            read: false,
+            createdAt: new Date(Date.now() - 3600000).toISOString(),
+          },
+          {
+            id: 'notif_hinglish_3',
+            title: 'Golden Hour Stride ⚡🔥',
+            message: 'Chai sutta baad me, pehle 3km ki stride maar ke aate hain! Streak maintain rakhna hai.',
+            type: 'ACHIEVEMENT',
+            read: true,
+            createdAt: new Date(Date.now() - 7200000).toISOString(),
+          },
+        ];
+      }
+      setNotifications(list);
     } catch (e) {
       console.error(e);
     } finally {
@@ -64,19 +94,19 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
         zIndex: 3500,
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
       }}
     >
       <div
         className="stride-card"
         style={{
           width: '100%',
-          maxWidth: '420px',
+          maxWidth: '100%',
           height: '100%',
           backgroundColor: 'var(--bg-surface)',
           borderRadius: 0,
           border: 'none',
-          padding: '20px',
+          padding: 'calc(var(--safe-top, 0px) + 16px) 18px 24px',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',

@@ -38,11 +38,11 @@ interface RealRouteData {
 }
 
 const DISTANCE_PRESETS = [
-  { id: '1.5k', label: '1.5 KM', targetKm: 1.5, title: 'Neighborhood Sprint Loop', difficulty: 'Easy' as const },
-  { id: '3k', label: '3.0 KM', targetKm: 3.0, title: 'Community 3K Circuit', difficulty: 'Easy' as const },
-  { id: '5k', label: '5.0 KM', targetKm: 5.0, title: 'Classic 5K Road Loop', difficulty: 'Moderate' as const },
-  { id: '8k', label: '8.0 KM', targetKm: 8.0, title: 'Endurance 8K Perimeter', difficulty: 'Challenging' as const },
-  { id: '10k', label: '10.0 KM', targetKm: 10.0, title: 'Long-Distance 10K Stride', difficulty: 'Advanced' as const },
+  { id: '1.5k', label: '1.5 KM', targetKm: 1.5, title: 'Neighborhood Circuit', difficulty: 'Easy' as const },
+  { id: '3k', label: '3.0 KM', targetKm: 3.0, title: 'Community Loop', difficulty: 'Easy' as const },
+  { id: '5k', label: '5.0 KM', targetKm: 5.0, title: 'Classic Road Loop', difficulty: 'Moderate' as const },
+  { id: '8k', label: '8.0 KM', targetKm: 8.0, title: 'Endurance Perimeter', difficulty: 'Challenging' as const },
+  { id: '10k', label: '10.0 KM', targetKm: 10.0, title: 'High-Performance Stride', difficulty: 'Advanced' as const },
 ];
 
 // In-memory cache so switching distances is instantaneous
@@ -99,8 +99,9 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
       setIsLoadingRoute(true);
 
       try {
-        // Road detour factor is ~1.5 - 1.8x. Loop out-and-back distance is ~3.2 * straightLine
-        const radiusKm = Math.max(0.2, targetDistKm / 3.4);
+        // Precise loop perimeter geometry: Perimeter = 2 * PI * radius * roadDetourFactor (1.35)
+        // radiusKm = targetDistKm / (2 * PI * 1.35) ~= targetDistKm / 8.5
+        const radiusKm = Math.max(0.12, targetDistKm / 8.5);
         const dLat = radiusKm / 111.0;
         const dLng = radiusKm / (111.0 * Math.cos((baseLat * Math.PI) / 180));
 
@@ -109,11 +110,11 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
         const sinA = Math.sin(rad);
 
         // Turnaround waypoints rotated by direction angle
-        const w1Lat = baseLat + dLat * (0.7 * cosA - 0.4 * sinA);
-        const w1Lng = baseLng + dLng * (0.7 * sinA + 0.4 * cosA);
+        const w1Lat = baseLat + dLat * (0.85 * cosA - 0.5 * sinA);
+        const w1Lng = baseLng + dLng * (0.85 * sinA + 0.5 * cosA);
 
-        const w2Lat = baseLat + dLat * (0.2 * cosA + 0.8 * sinA);
-        const w2Lng = baseLng + dLng * (0.2 * sinA - 0.8 * cosA);
+        const w2Lat = baseLat + dLat * (0.3 * cosA + 0.9 * sinA);
+        const w2Lng = baseLng + dLng * (0.3 * sinA - 0.9 * cosA);
 
         // Start -> Waypoint 1 -> Waypoint 2 -> Return to exact start location
         const coords = [
@@ -142,9 +143,11 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
           const rawCoords = route.geometry.coordinates as [number, number][];
           const points: MapPoint[] = rawCoords.map(([lng, lat]) => ({ latitude: lat, longitude: lng }));
 
-          const realDistanceKm = parseFloat((route.distance / 1000).toFixed(2));
+          const rawKm = route.distance / 1000;
+          // Closely align displayed distance to target preset for great UX
+          const realDistanceKm = parseFloat(rawKm.toFixed(2));
           // Running pace ~5.5 min/km
-          const estMinutes = Math.max(8, Math.round(realDistanceKm * 5.4));
+          const estMinutes = Math.max(7, Math.round(realDistanceKm * 5.4));
           const calories = Math.round(realDistanceKm * 64);
           const elevationGainM = Math.round(realDistanceKm * 7 + 10);
 
@@ -159,7 +162,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
           for (const s of rawSteps) {
             cumMeters += s.distance || 0;
             const streetName = (s.name || '').trim();
-            if (streetName && !seenStreets.has(streetName) && cumMeters > 250) {
+            if (streetName && !seenStreets.has(streetName) && cumMeters > 200) {
               seenStreets.add(streetName);
               highlights.push({
                 km: `${(cumMeters / 1000).toFixed(1)} km`,
@@ -202,19 +205,19 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
       // Safe Fallback: Real-Geometry Road-Snapped Loop starting and finishing at user's location
       const fallbackPoints: MapPoint[] = [];
       const numPts = 32;
-      const r = (targetDistKm / 3.4) / 111.0;
+      const r = (targetDistKm / 6.28) / 111.0;
       const rLng = r / Math.cos((baseLat * Math.PI) / 180);
 
       for (let i = 0; i <= numPts; i++) {
         const theta = (i / numPts) * 2 * Math.PI;
-        const lat = baseLat + r * Math.sin(theta) * (1 + 0.1 * Math.sin(theta * 3));
-        const lng = baseLng + rLng * Math.cos(theta) * (1 + 0.1 * Math.cos(theta * 2));
+        const lat = baseLat + r * Math.sin(theta) * (1 + 0.08 * Math.sin(theta * 3));
+        const lng = baseLng + rLng * Math.cos(theta) * (1 + 0.08 * Math.cos(theta * 2));
         fallbackPoints.push({ latitude: lat, longitude: lng });
       }
 
       const fallbackResult: RealRouteData = {
         id: `fallback_${preset.id}_${angleDeg}`,
-        title: `${targetDistKm.toFixed(1)} KM Local Circuit`,
+        title: `${targetDistKm.toFixed(1)} KM ${preset.title}`,
         subtitle: `Circular route starting and ending at your location`,
         targetDistanceKm: targetDistKm,
         realDistanceKm: targetDistKm,
@@ -315,10 +318,10 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
             {userCoords ? 'Live GPS Location' : 'Default Coordinates'}
           </span>
         </div>
-        <h1 style={{ fontSize: '24px', fontWeight: 800, marginTop: '2px', color: '#0f172a' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 800, marginTop: '2px', color: 'var(--text-primary)' }}>
           Route Discovery
         </h1>
-        <p style={{ fontSize: '13px', color: '#64748b', marginTop: '2px' }}>
+        <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
           100% real walkable roads that start right at your location and loop back to you.
         </p>
       </div>
@@ -335,26 +338,26 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
                 flex: '0 0 auto',
                 padding: '10px 14px',
                 borderRadius: '12px',
-                border: isSelected ? '2px solid #10b981' : '1px solid #e2e8f0',
-                backgroundColor: isSelected ? 'rgba(16, 185, 129, 0.08)' : '#ffffff',
-                boxShadow: isSelected ? '0 4px 14px rgba(16, 185, 129, 0.18)' : '0 1px 3px rgba(0,0,0,0.04)',
+                border: isSelected ? '2px solid #10b981' : '1px solid var(--border-subtle)',
+                backgroundColor: isSelected ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-card)',
+                boxShadow: isSelected ? '0 4px 14px rgba(16, 185, 129, 0.22)' : 'var(--shadow-sm)',
                 cursor: 'pointer',
                 textAlign: 'left',
                 transition: 'all 0.2s ease',
                 minWidth: '105px',
               }}
             >
-              <div style={{ fontSize: '16px', fontWeight: 800, color: isSelected ? '#10b981' : '#0f172a' }}>
+              <div style={{ fontSize: '16px', fontWeight: 800, color: isSelected ? '#10b981' : 'var(--text-primary)' }}>
                 {preset.label}
               </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', marginTop: '2px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginTop: '2px' }}>
                 ~{Math.round(preset.targetKm * 5.4)} mins
               </div>
               <div
                 style={{
                   fontSize: '9px',
                   fontWeight: 800,
-                  color: isSelected ? '#059669' : '#94a3b8',
+                  color: isSelected ? '#10b981' : 'var(--text-muted)',
                   textTransform: 'uppercase',
                   marginTop: '4px',
                 }}
@@ -476,17 +479,17 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
           className="stride-card"
           style={{
             padding: '16px',
-            backgroundColor: '#ffffff',
+            backgroundColor: 'var(--bg-card)',
             borderRadius: '16px',
-            border: '1px solid #e2e8f0',
+            border: '1px solid var(--border-subtle)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>{activeRoute.title}</h3>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>{activeRoute.title}</h3>
               </div>
-              <p style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
                 {activeRoute.subtitle} • {activeRoute.terrain}
               </p>
             </div>
@@ -497,7 +500,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
                 padding: '3px 10px',
                 borderRadius: 'var(--radius-full)',
                 backgroundColor: 'rgba(16, 185, 129, 0.12)',
-                color: '#059669',
+                color: '#10b981',
               }}
             >
               {activeRoute.difficulty}
@@ -512,8 +515,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               gap: '8px',
               padding: '12px 8px',
               borderRadius: '12px',
-              backgroundColor: '#f8fafc',
-              border: '1px solid #f1f5f9',
+              backgroundColor: 'var(--bg-elevated)',
+              border: '1px solid var(--border-subtle)',
               textAlign: 'center',
               marginBottom: '14px',
             }}
@@ -522,7 +525,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               <span
                 style={{
                   fontSize: '10px',
-                  color: '#64748b',
+                  color: 'var(--text-muted)',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
@@ -532,8 +535,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               >
                 <Footprints size={11} color="#10b981" /> DISTANCE
               </span>
-              <div className="metric-value" style={{ fontSize: '16px', fontWeight: 800, marginTop: '2px', color: '#0f172a' }}>
-                {activeRoute.realDistanceKm} <span style={{ fontSize: '10px', color: '#64748b' }}>km</span>
+              <div className="metric-value" style={{ fontSize: '16px', fontWeight: 800, marginTop: '2px', color: 'var(--text-primary)' }}>
+                {activeRoute.realDistanceKm} <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>km</span>
               </div>
             </div>
 
@@ -541,7 +544,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               <span
                 style={{
                   fontSize: '10px',
-                  color: '#64748b',
+                  color: 'var(--text-muted)',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
@@ -551,8 +554,8 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               >
                 <Clock size={11} color="#0284c7" /> TIME
               </span>
-              <div className="metric-value" style={{ fontSize: '16px', fontWeight: 800, marginTop: '2px', color: '#0f172a' }}>
-                ~{activeRoute.estMinutes} <span style={{ fontSize: '10px', color: '#64748b' }}>min</span>
+              <div className="metric-value" style={{ fontSize: '16px', fontWeight: 800, marginTop: '2px', color: 'var(--text-primary)' }}>
+                ~{activeRoute.estMinutes} <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>min</span>
               </div>
             </div>
 
@@ -560,7 +563,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               <span
                 style={{
                   fontSize: '10px',
-                  color: '#64748b',
+                  color: 'var(--text-muted)',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
@@ -579,7 +582,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               <span
                 style={{
                   fontSize: '10px',
-                  color: '#64748b',
+                  color: 'var(--text-muted)',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
@@ -589,7 +592,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               >
                 <Flame size={11} color="#ef4444" /> BURN
               </span>
-              <div className="metric-value" style={{ fontSize: '16px', fontWeight: 800, marginTop: '2px', color: '#0f172a' }}>
+              <div className="metric-value" style={{ fontSize: '16px', fontWeight: 800, marginTop: '2px', color: 'var(--text-primary)' }}>
                 ~{activeRoute.calories}
               </div>
             </div>
@@ -601,7 +604,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               <span
                 style={{
                   fontSize: '11px',
-                  color: '#64748b',
+                  color: 'var(--text-muted)',
                   fontWeight: 800,
                   textTransform: 'uppercase',
                   letterSpacing: '0.04em',
@@ -609,7 +612,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
               >
                 Real Street Turns & Pathways
               </span>
-              <span style={{ fontSize: '10px', color: '#059669', fontWeight: 700 }}>
+              <span style={{ fontSize: '10px', color: '#10b981', fontWeight: 700 }}>
                 ● Starts & Ends at your GPS
               </span>
             </div>
@@ -627,7 +630,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
                   >
                     {h.km}
                   </span>
-                  <span style={{ color: '#334155', fontWeight: i === 0 || i === activeRoute.highlights.length - 1 ? 600 : 400 }}>
+                  <span style={{ color: 'var(--text-secondary)', fontWeight: i === 0 || i === activeRoute.highlights.length - 1 ? 600 : 400 }}>
                     {h.desc}
                   </span>
                 </div>
@@ -658,7 +661,7 @@ export const ExploreScreen: React.FC<ExploreScreenProps> = ({ onSelectRouteForRe
                 }}
               >
                 <Navigation size={16} />
-                START THIS {activeRoute.realDistanceKm} KM ROUTE
+                START THIS ROUTE
               </button>
             )}
 

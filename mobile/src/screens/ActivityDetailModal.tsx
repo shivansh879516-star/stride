@@ -128,13 +128,13 @@ export const ActivityDetailModal: React.FC<ActivityDetailModalProps> = ({
         flexDirection: 'column',
       }}
     >
-      {/* Top Header Bar */}
+      {/* Top Header Bar with Safe Area Inset */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '14px 20px',
+          padding: 'calc(var(--safe-top, 0px) + 14px) 16px 12px',
           borderBottom: '1px solid var(--border-subtle)',
           position: 'sticky',
           top: 0,
@@ -149,15 +149,15 @@ export const ActivityDetailModal: React.FC<ActivityDetailModalProps> = ({
           <X size={22} />
         </button>
 
-        <span style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-primary)' }}>
           Stride Telemetry
         </span>
 
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <button
             onClick={() => setShowShareModal(true)}
             style={{
-              padding: '6px 12px',
+              padding: '6px 10px',
               fontSize: '11px',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: '#10b981',
@@ -172,16 +172,16 @@ export const ActivityDetailModal: React.FC<ActivityDetailModalProps> = ({
             }}
             title="Share to Instagram Story & Socials"
           >
-            <Share2 size={13} /> Share Story
+            <Share2 size={13} /> Share
           </button>
 
           <button
             onClick={handleDownloadGpx}
             className="btn btn-secondary"
-            style={{ padding: '6px 10px', fontSize: '11px', borderRadius: 'var(--radius-sm)' }}
+            style={{ padding: '6px 8px', fontSize: '11px', borderRadius: 'var(--radius-sm)' }}
             title="Download GPX file for Garmin/Apple Health"
           >
-            Export GPX
+            GPX
           </button>
 
           <button
@@ -189,7 +189,7 @@ export const ActivityDetailModal: React.FC<ActivityDetailModalProps> = ({
             style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '6px' }}
             title="Delete Stride"
           >
-            <Trash2 size={20} />
+            <Trash2 size={18} />
           </button>
         </div>
       </div>
@@ -279,7 +279,7 @@ export const ActivityDetailModal: React.FC<ActivityDetailModalProps> = ({
         </div>
 
         {/* Strava-Style Detailed Pace Area Graph Card */}
-        <div className="stride-card" style={{ padding: '20px 18px', background: '#ffffff', borderRadius: 'var(--radius-lg)' }}>
+        <div className="stride-card" style={{ padding: '20px 18px', background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 800 }}>Pace</h3>
             <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>

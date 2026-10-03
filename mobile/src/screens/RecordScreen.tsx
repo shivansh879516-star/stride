@@ -380,7 +380,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
           >
             <Flag size={14} color="#10b981" />
             <span style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {selectedRoute.name} ({(selectedRoute.distanceMeters / 1000).toFixed(1)} km)
+              {selectedRoute.name}
             </span>
             {onClearSelectedRoute && (
               <button
@@ -403,10 +403,10 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
           flex: 1,
           height: '52%',
           minHeight: '300px',
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--bg-surface)',
           borderRadius: '24px 24px 0 0',
-          boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.08)',
-          borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+          boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.18)',
+          borderTop: '1px solid var(--border-subtle)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -423,7 +423,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             {/* 1. Activity Mode Selector Pills */}
             <div
               style={{
-                backgroundColor: '#f1f5f9',
+                backgroundColor: 'var(--bg-elevated)',
                 padding: '4px',
                 borderRadius: 'var(--radius-md)',
                 display: 'flex',
@@ -443,7 +443,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                       borderRadius: 'var(--radius-sm)',
                       border: 'none',
                       backgroundColor: isSelected ? '#10b981' : 'transparent',
-                      color: isSelected ? '#ffffff' : '#64748b',
+                      color: isSelected ? '#ffffff' : 'var(--text-muted)',
                       fontSize: '12px',
                       fontWeight: 800,
                       cursor: 'pointer',
@@ -459,7 +459,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             {/* 2. Target Distance Goal Selector */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Target size={13} color="#10b981" /> Target Distance Goal
                 </span>
                 <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 700 }}>
@@ -477,9 +477,9 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                         flex: '0 0 auto',
                         padding: '6px 12px',
                         borderRadius: 'var(--radius-full)',
-                        border: isSelected ? '1.5px solid #10b981' : '1px solid #e2e8f0',
-                        backgroundColor: isSelected ? 'rgba(16, 185, 129, 0.1)' : '#f8fafc',
-                        color: isSelected ? '#059669' : '#475569',
+                        border: isSelected ? '1.5px solid #10b981' : '1px solid var(--border-subtle)',
+                        backgroundColor: isSelected ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-card)',
+                        color: isSelected ? '#10b981' : 'var(--text-secondary)',
                         fontSize: '11px',
                         fontWeight: 700,
                         cursor: 'pointer',
@@ -496,7 +496,7 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
             {/* 3. Target Pace Coach Goal Selector */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Gauge size={13} color="#10b981" /> Target Pace Coach
                 </span>
                 <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 700 }}>
@@ -514,9 +514,9 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                         flex: '0 0 auto',
                         padding: '6px 12px',
                         borderRadius: 'var(--radius-full)',
-                        border: isSelected ? '1.5px solid #10b981' : '1px solid #e2e8f0',
-                        backgroundColor: isSelected ? 'rgba(16, 185, 129, 0.1)' : '#f8fafc',
-                        color: isSelected ? '#059669' : '#475569',
+                        border: isSelected ? '1.5px solid #10b981' : '1px solid var(--border-subtle)',
+                        backgroundColor: isSelected ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-card)',
+                        color: isSelected ? '#10b981' : 'var(--text-secondary)',
                         fontSize: '11px',
                         fontWeight: 700,
                         cursor: 'pointer',
@@ -541,18 +541,18 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                   gap: '8px',
                   padding: '10px 12px',
                   borderRadius: 'var(--radius-md)',
-                  border: tracker.audioCoachEnabled ? '1.5px solid #10b981' : '1px solid #e2e8f0',
-                  backgroundColor: tracker.audioCoachEnabled ? 'rgba(16, 185, 129, 0.08)' : '#f8fafc',
+                  border: tracker.audioCoachEnabled ? '1.5px solid #10b981' : '1px solid var(--border-subtle)',
+                  backgroundColor: tracker.audioCoachEnabled ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-card)',
                   cursor: 'pointer',
                   textAlign: 'left',
                 }}
               >
-                {tracker.audioCoachEnabled ? <Volume2 size={18} color="#10b981" /> : <VolumeX size={18} color="#94a3b8" />}
+                {tracker.audioCoachEnabled ? <Volume2 size={18} color="#10b981" /> : <VolumeX size={18} color="var(--text-muted)" />}
                 <div>
-                  <div style={{ fontSize: '11px', fontWeight: 800, color: tracker.audioCoachEnabled ? '#059669' : '#475569' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: tracker.audioCoachEnabled ? '#10b981' : 'var(--text-secondary)' }}>
                     Audio Cues
                   </div>
-                  <div style={{ fontSize: '9px', color: '#94a3b8' }}>
+                  <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>
                     {tracker.audioCoachEnabled ? 'Voice per 1km' : 'Muted'}
                   </div>
                 </div>
@@ -567,18 +567,18 @@ export const RecordScreen: React.FC<RecordScreenProps> = ({
                   gap: '8px',
                   padding: '10px 12px',
                   borderRadius: 'var(--radius-md)',
-                  border: tracker.autoPauseEnabled ? '1.5px solid #10b981' : '1px solid #e2e8f0',
-                  backgroundColor: tracker.autoPauseEnabled ? 'rgba(16, 185, 129, 0.08)' : '#f8fafc',
+                  border: tracker.autoPauseEnabled ? '1.5px solid #10b981' : '1px solid var(--border-subtle)',
+                  backgroundColor: tracker.autoPauseEnabled ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-card)',
                   cursor: 'pointer',
                   textAlign: 'left',
                 }}
               >
-                <Pause size={18} color={tracker.autoPauseEnabled ? '#10b981' : '#94a3b8'} />
+                <Pause size={18} color={tracker.autoPauseEnabled ? '#10b981' : 'var(--text-muted)'} />
                 <div>
-                  <div style={{ fontSize: '11px', fontWeight: 800, color: tracker.autoPauseEnabled ? '#059669' : '#475569' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 800, color: tracker.autoPauseEnabled ? '#10b981' : 'var(--text-secondary)' }}>
                     Auto-Pause
                   </div>
-                  <div style={{ fontSize: '9px', color: '#94a3b8' }}>
+                  <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>
                     {tracker.autoPauseEnabled ? 'When stationary' : 'Continuous'}
                   </div>
                 </div>
