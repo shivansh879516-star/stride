@@ -79,8 +79,11 @@ class StepTrackerService {
       const res = await NativeStepCounter.getTodaySteps();
       if (res && typeof res.steps === 'number') {
         this.hasHardwareSensor = !!res.hasSensor;
-        // Hardware sensor takes precedence if greater
-        if (res.steps >= this.currentSteps || res.hasSensor) {
+        // Never wipe non-zero steps with 0 during initial sensor probe
+        if (res.steps > this.currentSteps) {
+          this.currentSteps = res.steps;
+          this.persistSteps();
+        } else if (res.steps > 0 && this.currentSteps === 0) {
           this.currentSteps = res.steps;
           this.persistSteps();
         }

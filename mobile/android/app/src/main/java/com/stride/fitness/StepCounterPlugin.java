@@ -30,7 +30,9 @@ import java.util.Locale;
 public class StepCounterPlugin extends Plugin implements SensorEventListener {
 
     private SensorManager sensorManager;
-    private Sensor stepSensor;
+    private Sensor stepCounterSensor;
+    private Sensor stepDetectorSensor;
+
     private static final String PREF_NAME = "stride_step_prefs";
     private static final String KEY_DATE = "last_step_date";
     private static final String KEY_BASELINE = "baseline_steps";
@@ -48,10 +50,18 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
             if (sensorManager == null) {
                 sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
             }
-            if (sensorManager != null && stepSensor == null) {
-                stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-                if (stepSensor != null) {
-                    sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            if (sensorManager != null) {
+                if (stepCounterSensor == null) {
+                    stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+                    if (stepCounterSensor != null) {
+                        sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_NORMAL);
+                    }
+                }
+                if (stepDetectorSensor == null) {
+                    stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+                    if (stepDetectorSensor != null) {
+                        sensorManager.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -65,11 +75,33 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
             int rawSteps = (int) event.values[0];
             latestRawSteps = rawSteps;
             updateStepsWithRaw(rawSteps);
+        } else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+            incrementTodayStepBy(1);
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+    private synchronized int incrementTodayStepBy(int delta) {
+        try {
+            SharedPreferences prefs = getContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            String todayStr = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            String savedDate = prefs.getString(KEY_DATE, "");
+            int todaySteps = prefs.getInt(KEY_TODAY_STEPS, 0);
+
+            if (!todayStr.equals(savedDate)) {
+                todaySteps = 0;
+                prefs.edit().putString(KEY_DATE, todayStr).apply();
+            }
+
+            todaySteps += delta;
+            prefs.edit().putInt(KEY_TODAY_STEPS, todaySteps).apply();
+            return todaySteps;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 
     private synchronized int updateStepsWithRaw(int rawSteps) {
         try {
@@ -115,9 +147,10 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
                 todaySteps = updateStepsWithRaw(latestRawSteps);
             }
 
+            boolean hasSensor = (stepCounterSensor != null || stepDetectorSensor != null);
             JSObject ret = new JSObject();
             ret.put("steps", todaySteps);
-            ret.put("hasSensor", stepSensor != null);
+            ret.put("hasSensor", hasSensor);
             ret.put("distanceKm", Math.round(todaySteps * 0.00076 * 100.0) / 100.0);
             ret.put("calories", Math.round(todaySteps * 0.04));
             ret.put("date", todayStr);
@@ -136,9 +169,10 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
             }
         }
         registerSensorIfNeeded();
+        boolean hasSensor = (stepCounterSensor != null || stepDetectorSensor != null);
         JSObject ret = new JSObject();
         ret.put("granted", true);
-        ret.put("hasSensor", stepSensor != null);
+        ret.put("hasSensor", hasSensor);
         call.resolve(ret);
     }
 
@@ -150,16 +184,18 @@ public class StepCounterPlugin extends Plugin implements SensorEventListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             granted = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED;
         }
+        boolean hasSensor = (stepCounterSensor != null || stepDetectorSensor != null);
         ret.put("granted", granted);
-        ret.put("hasSensor", stepSensor != null);
+        ret.put("hasSensor", hasSensor);
         call.resolve(ret);
     }
 
     @PluginMethod
     public void checkSensor(PluginCall call) {
         registerSensorIfNeeded();
+        boolean hasSensor = (stepCounterSensor != null || stepDetectorSensor != null);
         JSObject ret = new JSObject();
-        ret.put("hasSensor", stepSensor != null);
+        ret.put("hasSensor", hasSensor);
         call.resolve(ret);
     }
 }
